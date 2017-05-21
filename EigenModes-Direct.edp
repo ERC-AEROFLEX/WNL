@@ -1,0 +1,211 @@
+load "MUMPS_seq"
+load "thresholdings"
+
+include "Path.edp"
+include "Parameters.edp"
+include "Name.edp"
+include "MeshSpace.edp"
+
+
+cout <<"-------------------------------------------------------------------" << endl;
+cout << "-- Stability analysis of a cross-stream spring-mounted cylinder --" << endl;
+cout << "-------------------------------------------------------------------" << endl;
+cout << "--- mesh   = " << nummesh << endl;
+cout << "--- Re        =  " << Re << endl;
+cout << "--- rhos/rhof =  " << rho << endl;
+cout << "--- gammas    =  " << gammas << endl;
+cout << "-------------------------------------------------------" << endl;
+
+
+
+int ndoft,ndoff,ndofs;
+ndoff=fuuppp.ndof; 
+ndofs=2;
+ndoft=ndoff+ndofs;
+
+
+// Base Flow
+fuuppp [u0,v0,p0,f0,g0]; 
+real us0,vs0;
+us0=-1; vs0=0.;
+
+{
+ ifstream file(pathsteadysol+"Baseflow-"+nummesh+"-Re-"+Re+".txt");
+ file >> u0[];
+};
+
+
+plot(u0,value=1,wait=1);
+
+while(omegas<=omegasmax)
+{
+
+shift=0.5*(0.75+omegas)*1i;
+
+cout << "--- omegas    =  " << omegas << endl;
+cout << "--- shift  = " << shift << endl;
+
+//////////////////////////////////////////////////////
+
+cout << "Construction of matrix ( A - shift B )" << endl;
+
+matrix<complex> OP,B;
+
+{
+
+cout << "Construction Matrix Fluid - ( Aff - shift Bff ) " << endl;
+
+
+varf vOP([u1,v1,p1,f1,g1],[ut,vt,pt,ft,gt]) =
+int2d(th)(
+- shift*(u1*ut+v1*vt)
+-( (u0-us0)*dx(u1)+(v0-vs0)*dy(u1) + u1*dx(u0)+v1*dy(u0) )*ut
+-( (u0-us0)*dx(v1)+(v0-vs0)*dy(v1) + u1*dx(v0)+v1*dy(v0) )*vt
+- nu*(dx(u1)*dx(ut)+dy(u1)*dy(ut))
+- nu*(dx(v1)*dx(vt)+dy(v1)*dy(vt))
++ (dx(ut)+dy(vt))*p1
++ (dx(u1)+dy(v1))*pt + 1.e-12*(p1*pt+f1*ft+g1*gt) )
+-int1d(th,labelwall)(f1*ut+g1*vt)
+-int1d(th,labelwall)(u1*ft+v1*gt)
++on(4,v1=1)+on(1,u1=1.,v1=1.);
+
+matrix<complex> Aff;
+
+Aff = vOP(fuuppp,fuuppp,tgv=1.e30);
+
+cout << "Construction Matrix Solid - ( Ass - shift Bss )" << endl;
+      
+complex[int,int] Ass(ndofs,ndofs);
+Ass=0.;
+Ass(0,0)=-shift; Ass(0,1)=1.;
+Ass(1,0)=-omegas*omegas; Ass(1,1)=-2*omegas*gammas-shift;
+
+cout << "Construction Matrix Coupling " << endl;
+
+complex[int] fsu0(ndoff),fsu1(ndoff);
+
+varf vvs([u1,v1,p1,f1,g1],[ut,vt,pt,ft,gt]) = 
+int2d(th)( dy(u0)*ut + dy(v0)*vt )+int1d(th,labelwall)(gt);
+
+fsu0=0.; fsu1=vvs(0,fuuppp);
+        	
+complex[int] rs0(ndoff),rs1(ndoff);
+
+varf vfy([du,dv,dp,df,dg],[ut,vt,pt,ft,gt])=int1d(th,labelwall)(gt);
+
+rs0=0.; rs1=vfy(0,fuuppp); rs1*=(4/pi/rho);
+
+cout << "Assemblage Matrix" << endl;
+		
+OP = [
+[ Aff, fsu0   ,  fsu1  ],
+[rs0',Ass(0,0),Ass(0,1)],
+[rs1',Ass(1,0),Ass(1,1)] ];
+
+
+cout << "Construction of B " << endl;
+
+cout << "Construction Bff" << endl;
+
+varf vmassf([u1,v1,p1,f1,g1],[ut,vt,pt,ft,gt])
+=int2d(th)(u1*ut+v1*vt) ;
+
+matrix<complex> Bff = vmassf(fuuppp,fuuppp);
+
+cout << "Construction Bss" << endl;
+
+complex[int,int] Bss(ndofs,ndofs);
+Bss=0.+0.0*1i;
+Bss(0,0)=1.+0.0*1i; Bss(1,1)=1.+0.0*1i; 
+
+cout << "Assemblage B" << endl;
+
+fsu0=0.;fsu1=0.;
+rs0=0.;rs1=0.;
+
+
+B = [
+[ Bff , fsu0   ,  fsu1  ],
+[ rs0',Bss(0,0),Bss(0,1)],
+[ rs1',Bss(1,0),Bss(1,1)]
+];
+
+cout << "B-coef= " << B.nbcoef << endl;
+
+
+};
+
+cout << "OP-coef= " << OP.nbcoef << endl;
+
+cout << "Factorisation A " << endl;
+set(OP,solver=sparsesolver);
+set(B,solver=GMRES);
+
+complex[int] eig(nev); 
+complex[int,int] eigvect(ndoft,nev);   
+
+fuuppp<complex> [ud,vd,pd,fd,gd];
+fuuppp [ur,vr,pr,fr,gr];
+
+int kk=EigenValue(OP,B,sigma=shift,value=eig,rawvector=eigvect,tol=1e-12,maxit=100,ncv=50);
+
+{
+ofstream file(patheigenmode+"DirEig-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+".dat");
+
+for(int j=0; j<nev; j++)
+{
+ file << real(eig(j)) << " " << imag(eig(j)) << endl;
+ cout << "---------------------------" << endl;
+ cout << "--- j= " << j << " , eig= " << eig(j) << endl;
+
+ 
+ for(int i=0; i<ndoff; i++) ud[][i]=eigvect(i,j);
+ complex ysd=eigvect(ndoff,j);
+ complex vsd=eigvect(ndoff+1,j);
+
+ 
+[ur,vr,pr,fr,gr]=[real(ud),real(vd),real(pd),real(fd),real(gd)];
+
+
+complex Normef,Normes,Norme;
+Normef=int2d(th)(conj(ud)*ud+conj(vd)*vd);
+Normes=conj(vsd)*vsd+conj(ysd)*ysd ;
+Norme=Normef+Normes;
+cout << "Normef= " << Normef << endl;
+cout << "Normes= " << Normes << endl;
+cout << "Norme= " << Norme << endl;
+
+complex[int] temp1(ndoft),temp2(ndoft);
+
+temp1=B*eigvect(:,j);
+Norme=eigvect(:,j)'*temp1;
+cout << "Norme= " << Norme << endl;
+
+
+temp1=OP*eigvect(:,j);
+temp2=B*eigvect(:,j); temp2*=(shift-eig(j)); temp1+=temp2;
+
+cout << "Residu= " << temp1.l2 << endl;
+
+plot(ur,value=1,wait=1,cmm="j="+j+"-vsd="+vsd);
+
+if(iwrite==0)
+{
+	{
+	ofstream filev(patheigenmode+"Dir-Mode-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+j+".dat");
+	filev << eig(j) << endl;
+	filev << eigvect(:,j) << endl;
+	};
+};
+
+
+
+};
+
+
+}; 
+
+
+omegas+=domegas;
+
+};

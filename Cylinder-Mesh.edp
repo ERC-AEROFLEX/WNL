@@ -1,4 +1,6 @@
-int nummesh=22;
+include "Path.edp"
+include "Parameters.edp"
+include "Name.edp"
 
 real Lo=30;
 real Li=20;
@@ -52,4 +54,4 @@ mesh th = buildmesh( right1((Lh-Lh1)*nc)+ right2(2*Lh1*nm3)+ right3((Lh-Lh1)*nc)
 
 plot(th,wait=1);
 cout << th.nt << " " << th.nv << endl;
-savemesh(th,"mesh-"+nummesh+".msh");
+savemesh(th,pathmesh+"mesh-"+nummesh+".msh");

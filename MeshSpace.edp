@@ -1,0 +1,10 @@
+//////////////////////
+// Mesh and Spaces ///
+//////////////////////
+
+mesh th=readmesh(pathmesh+namemesh);
+
+fespace fp(th,P1);
+fespace fu(th,P1b);
+fespace fuuppp(th,[P1b,P1b,P1,P1,P1]);
+

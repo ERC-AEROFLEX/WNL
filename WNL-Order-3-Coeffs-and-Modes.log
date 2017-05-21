@@ -1,0 +1,294 @@
+  249 :
+  250 : rhsaug=0.;
+  251 : rhsaug(nft-1)=-ys1A;
+  252 :
+  253 : cout << "Resolution " << endl;
+  254 : solaug=A^-1*rhsaug;
+  255 :
+  256 : complex alpha=solaug(nft);
+  257 :
+  258 : cout << "alpha= " << alpha << endl;
+  259 :
+  260 : u311[]=solaug(0:nft-1);
+  261 : cout << " ys= " << solaug(nft-2) << endl;
+  262 : cout << " vs= " << solaug(nft-1) << endl;
+  263 : cout << " Fy= " << int1d(th,2)(g311) << endl;
+  264 : [ur,vr,pr,fr,gr]=[real(u311),real(v311),real(p311),real(f311),real(g311){ÆG·zdAñµÔK/];
+  265 : plot(ur,value=1,wait=1,cmm="Mode3-deltaA");
+  266 :
+  267 :
+  268 : {
+  269 : ofstream file(pathwnl+namewnl3DeltaA);
+  270 : file << solaug << endl;
+  271 : };
+  272 :
+  273 :
+  274 : cout << "Construction vecteur - Coeff Mean Flow " << endl;
+  275 :
+  276 : {
+  277 :  varf vrhs([u,v,p,f,g],[ut,vt,pt,ft,gt]) =
+  278 :  int2d(th)(-( u1A*dx(u2AAc) + (v1A-vs1A)*dy(u2AAc) )*ut
+  279 :            -( u1A*dx(v2AAc) + (v1A-vs1A)*dy(v2AAc) )*vt
+  280 :            -( u2AAc*dx(u1A) + (v2AAc-vs2AAc)*dy(u1A) )*ut
+  281 :            -( u2AAc*dx(v1A) + (v2AAc-vs2AAc)*dy(v1A) )*vt
+  282 :            )+on(4,v=0.)+on(1,u=0.,v=0.);
+  283 :
+  284 :
+  285 : fuuppp<complex> [ru,rv,rp,rf,rg];
+  286 : rhsaug=0.0;
+  287 : ru[]=vrhs(0,fuuppp,tgv=1);
+  288 : rhsaug(0:nft-3)=ru[];
+  289 : };
+  290 :
+  291 : cout << "Fin Construction vecteur " << endl;
+  292 :
+  293 :
+  294 : cout << "Resolution " << endl;
+  295 : solaug=A^-1*rhsaug;
+  296 :
+  297 : complex betamean=-solaug(nft);
+  298 : cout << "beta-mean= " << betamean << endl;
+  299 :
+  300 :
+  301 : {
+  302 : ofstream file(pathwnl+namewnl3AAAc);
+  303 : file << solaug << endl;
+  304 : };
+  305 :
+  306 :
+  307 : cout << "Construction vecteur - Coeff Harmonic " << endl;
+  308 :
+  309 : {
+  310 :   varf vrhs([u,v,p,f,g],[ut,vt,pt,ft,gt]) =
+  311 :  int2d(th)(-( u1Ac*dx(u2AA) + (v1Ac-vs1Ac)*dy(u2AA) )*ut
+  312 :            -( u1Ac*dx(v2AA) + (v1Ac-vs1Ac)*dy(v2AA) )*vt
+  313 :            -( u2AA*dx(u1Ac) + (v2AA-vs2AA)*dy(u1Ac) )*ut
+  314 :            -( u2AA*dx(v1Ac) + (v2AA-vs2AA)*dy(v1Ac) )*vt
+  315 :                  )+on(4,v=0.)+on(1,u=0.,v=0.);
+  316 :
+  317 : fuuppp<complex> [ru,rv,rp,rf,rg];
+  318 : rhsaug=0.0;
+  319 : ru[]=vrhs(0,fuuppp,tgv=1);
+  320 : rhsaug(0:nft-3)=ru[];
+  321 : };
+  322 :
+  323 : cout << "Fin Construction vecteur " << endl;
+  324 :
+  325 :
+  326 : cout << "Resolution " << endl;
+  327 : solaug=A^-1*rhsaug;
+  328 :
+  329 : complex betaharmo=-solaug(nft);
+  330 : cout << "beta-harmo= " << betaharmo << endl;
+  331 :
+  332 : cout << "beta-mean+harmo = " << betamean+betaharmo << endl;
+  333 :
+  334 :
+  335 : {
+  336 : ofstream file(pathwnl+namewnl3AAAcHarmo);
+  337 : file << solaug << endl;
+  338 : };
+  339 :
+  340 :
+  341 :
+  342 :
+  343 : cout << "Construction vecteur - Coeff Total " << endl;
+  344 :
+  345 : {
+  346 :  varf vrhs([u,v,p,f,g],[ut,vt,pt,ft,gt]) =
+  347 :  int2d(th)(-( u1A*dx(u2AAc) + (v1A-vs1A)*dy(u2AAc) )*ut
+  348 :            -( u1A*dx(v2AAc) + (v1A-vs1A)*dy(v2AAc) )*vt
+  349 :            -( u2AAc*dx(u1A) + (v2AAc-vs2AAc)*dy(u1A) )*ut
+  350 :            -( u2AAc*dx(v1A) + (v2AAc-vs2AAc)*dy(v1A) )*vt
+  351 :            -( u1Ac*dx(u2AA) + (v1Ac-vs1Ac)*dy(u2AA) )*ut
+  352 :            -( u1Ac*dx(v2AA) + (v1Ac-vs1Ac)*dy(v2AA) )*vt
+  353 :            -( u2AA*dx(u1Ac) + (v2AA-vs2AA)*dy(u1Ac) )*ut
+  354 :            -( u2AA*dx(v1Ac) + (v2AA-vs2AA)*dy(v1Ac) )*vt
+  355 :                  )+on(4,v=0.)+on(1,u=0.,v=0.);
+  356 :
+  357 :
+  358 : fuuppp<complex> [ru,rv,rp,rf,rg];
+  359 : rhsaug=0.0;
+  360 : ru[]=vrhs(0,fuuppp,tgv=1);
+  361 : rhsaug(0:nft-3)=ru[];
+  362 : };
+  363 :
+  364 : cout << "Fin Construction vecteur " << endl;
+  365 :
+  366 : cout << "Resolution " << endl;
+  367 : solaug=A^-1*rhsaug;
+  368 :
+  369 : complex beta=-solaug(nft);
+  370 : cout << "beta= " << beta << endl;
+  371 :
+  372 : u313[]=solaug(0:nft-1);
+  373 : cout << " ys= " << solaug(nft-2) << endl;
+  374 : cout << " vs= " << solaug(nft-1) << endl;
+  375 : cout << " Fy= " << int1d(th,2)(g313) << endl;
+  376 : [ur,vr,pr,fr,gr]=[real(u313),real(v313),real(p313),real(f313),real(g313){ÆG·zdAñµÔK/];
+  377 : plot(ur,value=1,wait=1,cmm="Mode3-AAAc");
+  378 :
+  379 :
+  380 : {
+  381 : ofstream file(pathwnl+namewnl3AAAc);
+  382 : file << solaug << endl;
+  383 : };
+  384 :
+  385 :
+  386 :
+  387 :
+  388 : cout << "--------------------------------" << endl;
+  389 : cout << "--------------------------------" << endl;
+  390 : cout << "Construction matrice - u33 " << endl;
+  391 :
+  392 : {
+  393 :
+  394 :  matrix<complex> Aff ; complex[int,int] Ass(nfs,nfs);
+  395 :  fuuppp<complex> [fsu0,fsv0,fsp0,fsf0,fsg0];
+  396 :  fuuppp<complex> [fsu1,fsv1,fsp1,fsf1,fsg1];
+  397 :  fuuppp<complex> [fsu2,fsv2,fsp2,fsf2,fsg2];
+  398 :  fuuppp<complex> [rsu0,rsv0,rsp0,rsf0,rsg0];
+  399 :  fuuppp<complex> [rsu1,rsv1,rsp1,rsf1,rsg1];
+  400 :  fuuppp<complex> [rsu2,rsv2,rsp2,rsf2,rsg2];
+  401 :
+  402 :  varf vAff([u,v,p,f,g],[ut,vt,pt,ft,gt]) =
+  403 :  int2d(th)(
+  404 :    3*omegaA*1i*(u*ut+v*vt)
+  405 :  +( (u0-us0)*dx(u)+v0*dy(u) + u*dx(u0)+v*dy(u0) )*ut
+  406 :  +( (u0-us0)*dx(v)+v0*dy(v) + u*dx(v0)+v*dy(v0) )*vt
+  407 :  + nu*(dx(u)*dx(ut)+dy(u)*dy(ut))
+  408 :  + nu*(dx(v)*dx(vt)+dy(v)*dy(vt))
+  409 :  - (dx(ut)+dy(vt))*p
+  410 :  - (dx(u)+dy(v))*pt + 1.e-16*(p*pt+f*ft+g*gt))
+  411 :  +int1d(th,2)(f*ut+g*vt)
+  412 :  +int1d(th,2)(u*ft+v*gt)
+  413 :  +on(4,v=1)+on(1,u=1.,v=1.);
+  414 :
+  415 :  Aff = vAff(fuuppp,fuuppp,tgv=-1);
+  416 :
+  417 :  // Matrix Fluid/Solid
+  418 :
+  419 :  varf vvs([u,v,p,f,g],[ut,vt,pt,ft,gt]) =
+  420 :  int2d(th)( - dy(u0)*ut - dy(v0)*vt )
+  421 : -int1d(th,2)(gt)+ on(4,v=0.)+on(1,u=0.,v=0.);
+  422 :
+  423 :  fsu0[]=0.; fsu1[]=vvs(0,fuuppp,tgv=1);
+  424 :
+  425 : // Matrix Solid/Fluid
+  426 : varf vfy([u,v,p,f,g],[ut,vt,pt,ft,gt]) = int1d(th,2)( -(4./pi/rho)*gt );{ÆG·zdAñµÔK/ 
+  427 :
+  428 :  rsu0[]=0.; rsu1[]=vfy(0,fuuppp);
+  429 :
+  430 :  /// Matrix Solid/Solid
+  431 :
+  432 :
+  433 :  Ass(0,0)=omegaA*1i; Ass(0,1)=-1;
+  434 :  Ass(1,1)=omegaA*1i; Ass(1,0)=omegas*omegas;
+  435 :
+  436 :
+  437 : // Added terms
+  438 :
+  439 :  varf vd([u,v,p,f,g],[ut,vt,pt,ft,gt]) =
+  440 :  int2d(th)( u1A*ut +v1A*vt );
+  441 :
+  442 :  varf va([u,v,p,f,g],[ut,vt,pt,ft,gt]) =
+  443 :  int2d(th)( au1A*ut + av1A*vt );
+  444 :
+  445 :  fsu2[]=vd(0,fuuppp);
+  446 :  rsu2[]=va(0,fuuppp);
+  447 :
+  448 : cout << "Assemblage matrice" << endl;
+  449 :
+  450 :  A = [
+  451 :   [Aff     ,  fsu0[]    , fsu1[]      ] ,
+  452 :   [rsu0[]' ,  Ass(0,0)  , Ass(0,1)    ] ,
+  453 :   [rsu1[]' ,  Ass(1,0)  , Ass(1,1)    ]
+  454 :   ];
+  455 :
+  456 : cout << "Fin Construction matrice" << endl;
+  457 :
+  458 : };
+  459 :
+  460 : cout << "Factorisation matrice " << endl;
+  461 : set(A,solver=sparsesolver);
+  462 :
+  463 :
+  464 : cout << "Construction vecteur - A^3 " << endl;
+  465 :
+  466 : {
+  467 :  varf vrhs([u,v,p,f,g],[ut,vt,pt,ft,gt]) =
+  468 :  int2d(th)(-( u2AA*dx(u1A) + (v2AA-vs2AA)*dy(u1A) )*ut
+  469 :            -( u2AA*dx(v1A) + (v2AA-vs2AA)*dy(v1A) )*vt
+  470 :            -( u1A*dx(u2AA) + (v1A-vs1A)*dy(u2AA) )*ut
+  471 :            -( u1A*dx(v2AA) + (v1A-vs1A)*dy(v2AA) )*vt
+  472 :             )+on(4,v=0.)+on(1,u=0.,v=0.);
+  473 :
+  474 : fuuppp<complex> [ru,rv,rp,rf,rg];
+  475 : ru[]=vrhs(0,fuuppp,tgv=1);
+  476 : rhs=0.0;
+  477 : rhs(0:nft-2)=ru[];
+  478 : };
+  479 :
+  480 : cout << "Fin Construction vecteur " << endl;
+  481 :
+  482 :
+  483 : cout << "Resolution " << endl;
+  484 : sol=A^-1*rhs;
+  485 :
+  486 :
+  487 : u33[]=sol(0:nft-1);
+  488 : cout << " ys= " << sol(nft-2) << endl;
+  489 : cout << " vs= " << sol(nft-1) << endl;
+  490 : cout << " Fy= " << int1d(th,2)(g33) << endl;
+  491 : [ur,vr,pr,fr,gr]=[real(u33),real(v33),real(p33),real(f33),real(g33)];
+  492 : plot(ur,value=1,wait=1,cmm="Mode3-AAA");
+  493 :
+  494 :
+  495 : {
+  496 : ofstream file(pathwnl+namewnl3AAA);
+  497 : file << sol << endl;
+  498 : };
+  499 :
+  500 :
+  501 : {
+  502 : ofstream file(pathwnl+namewnl3Coeffs);
+  503 : file << alpha << endl;
+  504 : file << beta << endl;
+  505 : };
+  506 :
+  507 :
+  508 :
+  509 :
+  510 :
+  511 :
+  512 :
+  513 :
+  514 :
+  515 :
+  516 :  sizestack + 1024 =27736  ( 26712 )
+ 
+-----------------------------------------
+--- Re        =  40
+--- rhos/rhof =  50
+--- omegas    =  0.67
+-----------------------------------------
+  --  mesh:  Nb of Triangles =  31687, Nb of Vertices 15935
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+-- Weakly NonLinear Analysis of a cross-stream spring-mounted cylinder --
+-- Third Order ---------------------------------------------------------
+--------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--- mesh   = 22
+--- Re        =  40
+--- rhos/rhof =  50
+--- gammas    =  0
+-------------------------------------------------------
+ Error openning file ./data/eigenmodes/Dir-Mode-Re-40-rho-50-gammas-0-omegas-0.6{ÆG·zdAñµÔK/7-mesh-22-num-1.dat
+  current line = 79
+Exec error : Error openning file
+   -- number :1
+Exec error : Error openning file
+   -- number :1
+ err code 7 ,  mpirank 0
+ try getConsole D:\marquet\Desktop\ERC\CODES\WNL\WNL-Order-3-Coeffs-and-Modes.ed{ÆG·zdAñµÔK/p

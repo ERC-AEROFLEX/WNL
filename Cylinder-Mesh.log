@@ -1,0 +1,127 @@
+-- FreeFem++ v  3.530000 (date mar. 25 avr. 2017 10:07:35)
+ Load: lg_fem lg_mesh lg_mesh3 eigenvalue
+    1 : include "Path.edp"///////////////////////
+    2 : //  Path definition ///
+    3 : ///////////////////////
+    4 :
+    5 : string pathmesh="./data/mesh/";
+    6 : string pathsteadysol="./data/steadysolution/";
+    7 : string patheigenmode="./data/eigenmodes/";
+    8 : string pathwnl="./data/weaklynonlinear/";
+    9 :
+   10 :
+   11 :
+    2 : include "Parameters.edp"//////////////////
+    2 : //  Parameters ///
+    3 : //////////////////
+    4 :
+    5 : int nummesh=22;
+    6 : int nummeshp=22;
+    7 : int labelwall=2;
+    8 : real tolNewton=1.e-12;
+    9 :
+   10 : real Re=40; // Nombre de Reynolds
+   11 : real Rep=40;
+   12 : real nu=1./Re;
+   13 :
+   14 :
+   15 : real rho=50; // Rapport de densite (solid/fluid)
+   16 : real omegas=0.67; // Nondimensional structural frequency (omegas=2*pi*fs{®GázdA¦\Šj)
+   17 : real domegas=0.01;
+   18 : real omegasmax=0.7;
+   19 : real gammas=0.0; // Structural damping coefficient
+   20 : real nev=10; // Nombre de valeurs propres
+   21 : int iwrite=1; // Ecriture vecteur propres
+   22 : int mode=1;
+   23 : complex shift;
+   24 :
+   25 :
+   26 : cout << "-----------------------------------------" << endl;
+   27 : cout << "--- Re        =  " << Re << endl;
+   28 : cout << "--- rhos/rhof =  " << rho << endl;
+   29 : cout << "--- omegas    =  " << omegas << endl;
+   30 : cout << "-----------------------------------------" << endl;
+   31 :
+   32 :
+    3 : include "Name.edp"///////////////////////
+    2 : // Name definitions ///
+    3 : ///////////////////////
+    4 :
+    5 : string namemesh="mesh-"+nummesh+".msh";
+    6 : string namebaseflow="Baseflow-"+nummesh+"-Re-"+Re+".txt";
+    7 : string namemode="Dir-Mode-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas{®GázdA¦\Šj-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
+    8 :
+    9 : string namewnlAA="u2-AA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"{®GázdA¦\Šj+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   10 : string namewnlAAc="u2-AAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas{®GázdA¦\Šj-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   11 :
+   12 :
+   13 :
+    4 :
+    5 : real Lo=30;
+    6 : real Li=20;
+    7 : real Lh=20;
+    8 :
+    9 : real Lh1=1;
+   10 :
+   11 : border bodyr(t=0,pi) { x = 1./2.*cos(t); y= 1./2*sin(t); label=2;}
+   12 :
+   13 : border bodyl(t=pi,2*pi) { x = 1./2.*cos(t); y= 1./2*sin(t); label=2;}
+   14 :
+   15 :
+   16 : border right1(t=-Lh,-Lh1){ x = Lo; y= t; label=3;}
+   17 : border right2(t=-Lh1,Lh1){ x = Lo; y= t; label=3;}
+   18 : border right3(t=Lh1,Lh){ x = Lo; y= t; label=3;}
+   19 :
+   20 : border top(t=Lo,-Li) { x = t; y= Lh; label=4;}
+   21 :
+   22 : border left1(t=Lh,Lh1) { x = -Li; y= t; label=1;}
+   23 : border left2(t=Lh1,-Lh1) { x = -Li; y= t; label=1;}
+   24 : border left3(t=-Lh1,-Lh) { x = -Li; y= t; label=1;}
+   25 :
+   26 : border down(t=-Li,Lo) { x = t; y= -Lh; label=4;}
+   27 :
+   28 : border insidetop0(t=-Li,-1) { x = t; y= Lh1; label=5;}
+   29 : border insidetop1(t=-1,Lo/4) { x = t; y= Lh1; label=5;}
+   30 : border insidetop2(t=Lo/4,Lo/2) { x = t; y= Lh1; label=5;}
+   31 : border insidetop3(t=Lo/2,Lo) { x = t; y= Lh1; label=5;}
+   32 :
+   33 : border insidedown0(t=-Li,-1) { x = t; y= -Lh1; label=5;}
+   34 : border insidedown1(t=-1,Lo/4) { x = t; y= -Lh1; label=5;}
+   35 : border insidedown2(t=Lo/4,Lo/2) { x = t; y= -Lh1; label=5;}
+   36 : border insidedown3(t=Lo/2,Lo) { x = t; y= -Lh1; label=5;}
+   37 :
+   38 : border insidemiddle1(t=0.5,Lo/4) { x = t; y= 0; label=5;}
+   39 : border insidemiddle2(t=-1,-0.5) { x = t; y= 0; label=5;}
+   40 :
+   41 :
+   42 : // densite de points
+   43 : int nf=20;
+   44 : int nm1=15;
+   45 : int nm2=10;
+   46 : int nm3=5;
+   47 : int nc=1;
+   48 :
+   49 : mesh th = buildmesh( right1((Lh-Lh1)*nc)+ right2(2*Lh1*nm3)+ right3((Lh-{®GázdA¦\ŠjLh1)*nc)
+   50 : + top((Lo+Li)*nc*0.5)+left1((Lh-Lh1)*nc*0.5)+left2(2*Lh1*nm3*0.5)+left3({®GázdA¦\Šj(Lh-Lh1)*nc*0.5)+down((Lo+Li)*nc*0.5) + bodyl(-pi*nf*0.5)+ bodyr(-pi*nf*0.5)
+   51 : + insidetop0((Li-1)*nm3)+ insidetop1((Lo/4+1)*nm1)+insidetop2(Lo/4*nm2)+{®GázdA¦\Šjinsidetop3(Lo/2*nm3)
+   52 : + insidedown0((Li-1)*nm3)+ insidedown1((Lo/4+1)*nm1) + insidedown2(Lo/4*{®GázdA¦\Šjnm2)+ insidedown3(Lo/2*nm3)
+   53 : + insidemiddle1((Lo/4-0.5)*nf)+ insidemiddle2(0.5*nf) ) ;
+   54 :
+   55 : plot(th,wait=1);
+   56 : cout << th.nt << " " << th.nv << endl;
+   57 : savemesh(th,pathmesh+"mesh-"+nummesh+".msh");
+   58 :  sizestack + 1024 =2072  ( 1048 )
+ 
+-----------------------------------------
+--- Re        =  40
+--- rhos/rhof =  50
+--- omegas    =  0.67
+-----------------------------------------
+  --  mesh:  Nb of Triangles =  31687, Nb of Vertices 15935
+31687 15935
+  number of required edges : 0
+times: compile 0.207s, execution 0.76s,  mpirank:0
+ ######## We forget of deleting   226 Nb pointer,   0Bytes  ,  mpirank 0, memory{®GázdA¦\Šj leak =0
+ CodeAlloc : nb ptr  3558,  size :394960 mpirank: 0
+Ok: Normal End
+ try getConsole D:\marquet\Desktop\ERC\CODES\WNL\Cylinder-Mesh.edp

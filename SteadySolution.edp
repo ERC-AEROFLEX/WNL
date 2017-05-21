@@ -1,18 +1,14 @@
-// Conditions aux limites sur le cylindres prises en compte de facon faible	
-// Version chere sans reduction de espace des forces
+cout <<"-----------------------------------------------------" << endl;
+cout << "-- Steady solution of laminar incompressible flow --" << endl;
+cout << "----------------------------------------------------" << endl;
+
 load "MUMPS_seq"
 
-// Nombre de Reynolds
-real Re=46.7;
-real Rep=46;
-int nummesh=22;
-int nummeshp=22;
-real nu=1./Re;
-real tolNewton=1.e-12;
 
-mesh th=readmesh("../mesh/mesh-"+nummesh+".msh");
-			
-fespace fuuppp(th,[P1b,P1b,P1,P1,P1]);
+include "Path.edp"
+include "Parameters.edp"
+include "Name.edp"
+include "MeshSpace.edp"
 		
 fuuppp [u0,v0,p0,f0,g0];
 real us0,vs0;
@@ -21,14 +17,14 @@ us0=-1.; vs0=0.0;
 if(nummesh!=nummeshp)
 {
 
-	mesh thp=readmesh("../mesh/mesh-"+nummeshp+".msh");
+	mesh thp=readmesh("data/mesh/mesh-"+nummeshp+".msh");
 			
 	fespace fuupppr(thp,[P1b,P1b,P1,P1,P1]);
 		
 	fuupppr [u0r,v0r,p0r,f0r,g0r];
 
 	{
-	ifstream file("./Baseflow-"+nummeshp+"-Re-"+Rep+".txt");
+	ifstream file(pathsteadysol+"Baseflow-"+nummeshp+"-Re-"+Rep+".txt");
 	file >> u0r[];
 	};
 
@@ -43,7 +39,7 @@ else
 	else
 	{
 	{
-	ifstream file("./Baseflow-"+nummesh+"-Re-"+Rep+".txt");
+	ifstream file(pathsteadysol+"Baseflow-"+nummesh+"-Re-"+Rep+".txt");
 	file >> u0[];
 	};
 	};
@@ -115,7 +111,7 @@ while(sqrt(residu)>1.e-12)
 	};
 
 {
-			ofstream file("./Baseflow-"+nummesh+"-Re-"+Re+".txt");
+			ofstream file(pathsteadysol+"Baseflow-"+nummesh+"-Re-"+Re+".txt");
 			file << u0[];
 };
 	

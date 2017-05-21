@@ -1,0 +1,295 @@
+   10 : string namewnlAAc="u2-AAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas{®GázdAÉ§}-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   11 :
+   12 :
+   13 :
+    7 : include "MeshSpace.edp"//////////////////////
+    2 : // Mesh and Spaces ///
+    3 : //////////////////////
+    4 :
+    5 : mesh th=readmesh(pathmesh+namemesh);
+    6 :
+    7 : fespace fp(th,P1);
+    8 : fespace fu(th,P1b);
+    9 : fespace fuuppp(th,[P1b,P1b,P1,P1,P1]);
+   10 :
+   11 :
+    8 :
+    9 :
+   10 : cout <<"-------------------------------------------------
+  ... : -------------------------" << endl;
+   11 : cout << "-- Weakly NonLinear Analysis of a cross-stream sp
+  ... : ring-mounted cylinder --" << endl;
+   12 : cout << "-- Second Order -- " << endl;
+   13 : cout << "-------------------------------------------------
+  ... : ------------------------" << endl;
+   14 : cout << "--- mesh   = " << nummesh << endl;
+   15 : cout << "--- Re        =  " << Re << endl;
+   16 : cout << "--- rhos/rhof =  " << rho << endl;
+   17 : cout << "--- gammas    =  " << gammas << endl;
+   18 : cout << "-------------------------------------------------
+  ... : ------" << endl;
+   19 :
+   20 :
+   21 :
+   22 :
+   23 : fuuppp [ur,vr,pr,fr,gr]; complex ys1,vs1;
+   24 :
+   25 : fuuppp [u0,v0,p0,f0,g0]; real us0=-1;
+   26 : fuuppp<complex> [u1A,v1A,p1A,f1A,g1A]; complex ys1A,vs1A;
+   27 : fuuppp<complex> [u1Ac,v1Ac,p1Ac,f1Ac,g1Ac]; complex ys1Ac,vs1Ac;
+   28 : fuuppp<complex> [u1l,v1l,p1l,f1l,g1l]; complex ys1l,vs1l;
+   29 : fuuppp<complex> [u1r,v1r,p1r,f1r,g1r]; complex ys1r,vs1r;
+   30 :
+   31 : real lambdaA,omegaA;
+   32 : real lambdaB,omegaB;
+   33 :
+   34 :
+   35 : int nff=fuuppp.ndof; int nfs=2; int nft=nff+nfs;
+   36 :
+   37 : ///////////////////////////
+   38 : ////  Variables ///////////
+   39 : ///////////////////////////
+   40 :
+   41 : matrix<complex> A,Aff,Mff;
+   42 : fuuppp<complex> [fsu0,fsv0,fsp0,fsf0,fsg0];
+   43 : fuuppp<complex> [fsu1,fsv1,fsp1,fsf1,fsg1];
+   44 : fuuppp<complex> [rsu0,rsv0,rsp0,rsf0,rsg0];
+   45 : fuuppp<complex> [rsu1,rsv1,rsp1,rsf1,rsg1];
+   46 :
+   47 : complex[int] sol(nft),rhs(nft);
+   48 :
+   49 : real Omega,Coeff;
+   50 :
+   51 : ///////////////////////////
+   52 : /////  Base Flow   ////////
+   53 : ///////////////////////////
+   54 :
+   55 : {
+   56 :  ifstream file(pathsteadysol+namebaseflow);
+   57 :  file >> u0[];
+   58 : };
+   59 :
+   60 : ////////////////////////
+   61 : /////  Mode A   ////////
+   62 : ////////////////////////
+   63 :
+   64 : complex eig;
+   65 :
+   66 : {
+   67 :  ifstream file(patheigenmode+namemode);
+   68 :  file >> eig ;
+   69 :  file >> sol ;
+   70 : };
+   71 :
+   72 : lambdaA=real(eig); omegaA=imag(eig);
+   73 : u1A[]=sol(0:nff-1); ys1A=sol(nft-2); vs1A=sol(nft-1);
+   74 : [u1Ac,v1Ac,p1Ac,f1Ac,g1Ac]=[conj(u1A),conj(v1A),conj(p1A),conj(f1A),conj{®GázdAÉ§}(g1A)];
+   75 : ys1Ac=conj(ys1A);vs1Ac=conj(vs1A);
+   76 :
+   77 :
+   78 : cout << "eigA= " << eig << endl;
+   79 :
+   80 : [ur,vr,pr,fr,gr]=[real(u1A),real(v1A),real(p1A),real(f1A),real(g1A)];
+   81 : plot(ur,value=1,wait=1,cmm="u1A-r");
+   82 :
+   83 :
+   84 :
+   85 :
+   86 : ///////////////////////////////////////////////
+   87 : ////   Formulation variationnelle  ////////////
+   88 : ///////////////////////////////////////////////
+   89 :
+   90 :  /// Matrix Fluid/Fluid
+   91 :
+   92 :  varf vAff([u,v,p,f,g],[ut,vt,pt,ft,gt]) =
+   93 :  int2d(th)(
+   94 :   ( (u0-us0)*dx(u)+v0*dy(u) + u*dx(u0)+v*dy(u0) )*ut
+   95 :  +( (u0-us0)*dx(v)+v0*dy(v) + u*dx(v0)+v*dy(v0) )*vt
+   96 :  + nu*(dx(u)*dx(ut)+dy(u)*dy(ut))
+   97 :  + nu*(dx(v)*dx(vt)+dy(v)*dy(vt))
+   98 :  - (dx(ut)+dy(vt))*p
+   99 :  - (dx(u)+dy(v))*pt + 1.e-16*(p*pt+f*ft+g*gt))
+  100 :  +int1d(th,2)(f*ut+g*vt)
+  101 :  +int1d(th,2)(u*ft+v*gt)
+  102 :  +on(4,v=1)+on(1,u=1.,v=1.);
+  103 :
+  104 : varf vMff([u,v,p,f,g],[ut,vt,pt,ft,gt]) =
+  105 :  int2d(th)( 1i*(u*ut+v*vt) )+on(4,v=1)+on(1,u=1.,v=1.);
+  106 :
+  107 :  Aff = vAff(fuuppp,fuuppp,tgv=-1);
+  108 :  Mff = vMff(fuuppp,fuuppp,tgv=-1);
+  109 :
+  110 :  // Matrix Fluid/Solid
+  111 :
+  112 :  varf vvs([u,v,p,f,g],[ut,vt,pt,ft,gt]) =
+  113 :  int2d(th)( - dy(u0)*ut - dy(v0)*vt )
+  114 : -int1d(th,2)(gt)+ on(4,v=0.)+on(1,u=0.,v=0.);
+  115 :
+  116 :  fsu0[]=0.; fsu1[]=vvs(0,fuuppp,tgv=1);
+  117 :
+  118 : // Matrix Solid/Fluid
+  119 : varf vfy([u,v,p,f,g],[ut,vt,pt,ft,gt]) = int1d(th,2)( -(4./pi/rho)*gt );{®GázdAÉ§} 
+  120 :
+  121 :  rsu0[]=0.; rsu1[]=vfy(0,fuuppp);
+  122 :
+  123 :  /// Matrix Solid/Solid
+  124 :
+  125 :  complex[int,int] Ass(nfs,nfs);
+  126 :  Ass=0.; Ass(0,1)=-1; Ass(1,0)=omegas*omegas;
+  127 :
+  128 :
+  129 : // Right-hand sides
+  130 :
+  131 :  varf vrhsf([u,v,p,f,g],[ut,vt,pt,ft,gt]) =
+  132 :  int2d(th)( -( u1l*dx(u1r) + (v1l-vs1l)*dy(u1r) )*ut
+  133 :             -( u1l*dx(v1r) + (v1l-vs1l)*dy(v1r) )*vt
+  134 :             -( u1r*dx(u1l) + (v1r-vs1r)*dy(u1l) )*ut
+  135 :             -( u1r*dx(v1l) + (v1r-vs1r)*dy(v1l) )*vt )
+  136 :  +on(4,v=0.)+on(1,u=0.,v=0.);
+  137 :
+  138 :
+  139 :
+  140 : /////////////////////////////////
+  141 : ////////// Probleme A-A /////////
+  142 : /////////////////////////////////
+  143 :
+  144 : cout << "-- Ordre 2 - Interaction A-A --" << endl;
+  145 :
+  146 : u1r[]=u1A[]; vs1r=vs1A;
+  147 : u1l[]=u1A[]; vs1l=vs1A;
+  148 : Omega=omegaA+omegaA;
+  149 : Coeff=0.5;
+  150 :
+  151 : cout << "Construction vecteur " << endl;
+  152 : rhs=0.;
+  153 :
+  154 : {
+  155 :  fuuppp<complex> [ru,rv,rp,rf,rg];
+  156 :  ru[]=vrhsf(0,fuuppp,tgv=1);
+  157 :  rhs(0:nff-1)=ru[];
+  158 : };
+  159 :
+  160 : cout << "Construction matrice" << endl;
+  161 :
+  162 : {
+  163 :  Ass(0,0)=Omega*1i; Ass(1,1)=Omega*1i;
+  164 :  if(Omega!=0){ Mff=Omega*Mff; Aff=Aff+Mff;};
+  165 :
+  166 :  A = [
+  167 :   [Aff  , fsu0[] , fsu1[] ] ,
+  168 :   [rsu0[]' , Ass(0,0)  , Ass(0,1)  ] ,
+  169 :   [rsu1[]' , Ass(1,0)  , Ass(1,1)  ]
+  170 :   ];
+  171 :
+  172 :  if(Omega!=0){Mff=-1*Mff; Aff=Aff+Mff; Mff=(1./Omega)*Mff;};
+  173 :
+  174 : };
+  175 :
+  176 :
+  177 : cout << "Factorisation matrice " << endl;
+  178 : set(A,solver=sparsesolver);
+  179 :
+  180 : cout << "Resolution " << endl;
+  181 : sol=A^-1*rhs; sol*=Coeff; //(seulement si meme mode)
+  182 :
+  183 :
+  184 : {
+  185 : fuuppp<complex> [u2,v2,p2,f2,g2];
+  186 : u2[]=sol(0:nff-1);
+  187 : cout << " ys= " << sol(nft-2) << endl;
+  188 : cout << " vs= " << sol(nft-1) << endl;
+  189 : cout << " Fy= " << int1d(th,2)(g2) << endl;
+  190 : [ur,vr,pr,fr,gr]=[real(u2),real(v2),real(p2),real(f2),real(g2)];
+  191 : plot(ur,value=1,wait=1,cmm="Mode2-A-A");
+  192 : };
+  193 :
+  194 : {
+  195 : ofstream file(pathwnl+namewnlAA);
+  196 : file << sol << endl;
+  197 : };
+  198 :
+  199 :
+  200 : /////////////////////////////////
+  201 : ////////// Probleme A-Ac /////////
+  202 : /////////////////////////////////
+  203 :
+  204 : cout << "-- Ordre 2 - Interaction A-Ac --" << endl;
+  205 :
+  206 : u1r[]=u1A[]; vs1r=vs1A;
+  207 : u1l[]=u1Ac[]; vs1l=vs1Ac;
+  208 : Omega=0.;
+  209 : Coeff=1.;
+  210 :
+  211 : cout << "Construction vecteur " << endl;
+  212 : rhs=0.;
+  213 :
+  214 : {
+  215 :  fuuppp<complex> [ru,rv,rp,rf,rg];
+  216 :  ru[]=vrhsf(0,fuuppp,tgv=1);
+  217 :  rhs(0:nff-1)=ru[];
+  218 : };
+  219 :
+  220 : cout << "Construction matrice" << endl;
+  221 :
+  222 : {
+  223 :  Ass(0,0)=Omega*1i; Ass(1,1)=Omega*1i;
+  224 :  if(Omega!=0){ Mff=Omega*Mff; Aff=Aff+Mff;};
+  225 :
+  226 :  A = [
+  227 :   [Aff  , fsu0[] , fsu1[] ] ,
+  228 :   [rsu0[]' , Ass(0,0)  , Ass(0,1)  ] ,
+  229 :   [rsu1[]' , Ass(1,0)  , Ass(1,1)  ]
+  230 :   ];
+  231 :
+  232 :  if(Omega!=0){Mff=-1*Mff; Aff=Aff+Mff; Mff=(1./Omega)*Mff;};
+  233 :
+  234 : };
+  235 :
+  236 :
+  237 : cout << "Factorisation matrice " << endl;
+  238 : set(A,solver=sparsesolver);
+  239 :
+  240 : cout << "Resolution " << endl;
+  241 : sol=A^-1*rhs; sol*=Coeff;
+  242 :
+  243 : {
+  244 : fuuppp<complex> [u2,v2,p2,f2,g2];
+  245 : u2[]=sol(0:nff-1);
+  246 : cout << " ys= " << sol(nft-2) << endl;
+  247 : cout << " vs= " << sol(nft-1) << endl;
+  248 : cout << " Fy= " << int1d(th,2)(g2) << endl;
+  249 : [ur,vr,pr,fr,gr]=[real(u2),real(v2),real(p2),real(f2),real(g2)];
+  250 : plot(ur,value=1,wait=1,cmm="Mode2-A-Ac");
+  251 : };
+  252 :
+  253 : {
+  254 : ofstream file(pathwnl+namewnlAAc);
+  255 : file << sol << endl;
+  256 : };
+  257 :
+  258 :
+  259 :  sizestack + 1024 =12136  ( 11112 )
+ 
+-----------------------------------------
+--- Re        =  40
+--- rhos/rhof =  50
+--- omegas    =  0.67
+-----------------------------------------
+  --  mesh:  Nb of Triangles =  31687, Nb of Vertices 15935
+--------------------------------------------------------------------------
+-- Weakly NonLinear Analysis of a cross-stream spring-mounted cylinder --
+-- Second Order --
+-------------------------------------------------------------------------
+--- mesh   = 22
+--- Re        =  40
+--- rhos/rhof =  50
+--- gammas    =  0
+-------------------------------------------------------
+ Error openning file ./data/eigenmodes/Dir-Mode-Re-40-rho-50-gammas-0-omegas-0.6{®GázdAÉ§}7-mesh-22-num-1.dat
+  current line = 67
+Exec error : Error openning file
+   -- number :1
+Exec error : Error openning file
+   -- number :1
+ err code 7 ,  mpirank 0
+ try getConsole D:\marquet\Desktop\ERC\CODES\WNL\WNL-Order-2.edp

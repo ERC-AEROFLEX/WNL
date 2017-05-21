@@ -1,0 +1,10 @@
+///////////////////////
+//  Path definition ///
+///////////////////////
+
+string pathmesh="./data/mesh/";
+string pathsteadysol="./data/steadysolution/";
+string patheigenmode="./data/eigenmodes/";
+string pathwnl="./data/weaklynonlinear/";
+
+

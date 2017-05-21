@@ -1,47 +1,28 @@
 load "MUMPS_seq"
 load "thresholdings"
 
-cout <<"-------------------------------------------------------------" << endl;
-cout << "-- Stability analysis - one-spring mounted cylinder --" << endl;
-cout << "---------------------------------------------------------------" << endl;
+
+include "Path.edp"
+include "Parameters.edp"
+include "Name.edp"
+include "MeshSpace.edp"
 
 
-//Parametres adimensiones physiques
-
-real Re=40; // Nombre de Reynolds
-real rho=50; // Rapport de densite (solid/fluid)
-real omegas=0.67; // Nondimensional structural frequency (omegas=2*pi*fs)
-real domegas=0.01;
-real omegasmax=0.7;
-real gammas=0.0; // Structural damping coefficient
-
-//Parametres numeriques
-int nummesh=22; // Maillage
-int labelwall=2;
-real nev=10; // Nombre de valeurs propres
-int iwrite=1; // Ecriture vecteur propres
-complex shift;
-
+cout <<"-------------------------------------------------------------------" << endl;
+cout << "-- Stability analysis of a cross-stream spring-mounted cylinder --" << endl;
+cout << "-------------------------------------------------------------------" << endl;
+cout << "--- mesh   = " << nummesh << endl;
 cout << "--- Re        =  " << Re << endl;
 cout << "--- rhos/rhof =  " << rho << endl;
 cout << "--- gammas    =  " << gammas << endl;
 cout << "-------------------------------------------------------" << endl;
 
 
-cout << "--- mesh   = " << nummesh << endl;
-cout << "-------------------------------------------------------" << endl;
-
-
-mesh th=readmesh("../../mesh/mesh-"+nummesh+".msh");
-
-fespace fuuppp(th,[P1b,P1b,P1,P1,P1]);
-
 int ndoft,ndoff,ndofs;
 ndoff=fuuppp.ndof; 
 ndofs=2;
 ndoft=ndoff+ndofs;
 
-real nu=1./Re;
 
 // Base Flow
 fuuppp [u0,v0,p0,f0,g0]; 
@@ -49,7 +30,7 @@ real us0,vs0;
 us0=-1; vs0=0.;
 
 {
- ifstream file("../../baseflow-wbc/Baseflow-"+nummesh+"-Re-"+Re+".txt");
+ ifstream file(pathsteadysol+"Baseflow-"+nummesh+"-Re-"+Re+".txt");
  file >> u0[];
 };
 
@@ -121,6 +102,7 @@ OP = [
 [rs0',Ass(0,0),Ass(0,1)],
 [rs1',Ass(1,0),Ass(1,1)] ];
 
+OP=OP';
 
 cout << "Construction of B " << endl;
 
@@ -149,6 +131,8 @@ B = [
 [ rs1',Bss(1,0),Bss(1,1)]
 ];
 
+B=B';
+
 cout << "B-coef= " << B.nbcoef << endl;
 
 
@@ -166,10 +150,10 @@ complex[int,int] eigvect(ndoft,nev);
 fuuppp<complex> [ud,vd,pd,fd,gd];
 fuuppp [ur,vr,pr,fr,gr];
 
-int kk=EigenValue(OP,B,sigma=shift,value=eig,rawvector=eigvect,tol=1e-12,maxit=100,ncv=50);
+int kk=EigenValue(OP,B,sigma=conj(shift),value=eig,rawvector=eigvect,tol=1e-12,maxit=100,ncv=50);
 
 {
-ofstream file("DirEig-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+".dat");
+ofstream file(patheigenmode+"AdjEig-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+".dat");
 
 for(int j=0; j<nev; j++)
 {
@@ -202,7 +186,7 @@ cout << "Norme= " << Norme << endl;
 
 
 temp1=OP*eigvect(:,j);
-temp2=B*eigvect(:,j); temp2*=(shift-eig(j)); temp1+=temp2;
+temp2=B*eigvect(:,j); temp2*=(conj(shift)-eig(j)); temp1+=temp2;
 
 cout << "Residu= " << temp1.l2 << endl;
 
@@ -211,7 +195,7 @@ plot(ur,value=1,wait=1,cmm="j="+j+"-vsd="+vsd);
 if(iwrite==0)
 {
 	{
-	ofstream filev("Dir-Mode-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+j+".dat");
+	ofstream filev(patheigenmode+"Adj-Mode-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+j+".dat");
 	filev << eig(j) << endl;
 	filev << eigvect(:,j) << endl;
 	};
