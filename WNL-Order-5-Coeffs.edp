@@ -1,60 +1,22 @@
 load "MUMPS_seq"
 
-//////////////////
-//  Parametres ///
-//////////////////
-
-real Re=40;
-real rho=50; 
-real omegas=0.657; 
-real gammas=0.0;
-int nummesh=22; 
-int mode=1;
-int modeadj=1;
-
-real nu=1./Re;
-
-string pathmesh="mesh/";
-string pathbaseflow="baseflow/";
-string pathmode="stabilite/";
-string pathwnl="wnl/";
-
-string namemesh="mesh-"+nummesh+".msh";
-string namebaseflow="Baseflow-"+nummesh+"-Re-"+Re+".txt";
-string namemode="Dir-Mode-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
-string namemodeadj="Adj-Mode-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
-
-string namewnl2AA="u2-AA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
-string namewnl2AAc="u2-AAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+include "Path.edp"
+include "Parameters.edp"
+include "Name.edp"
+include "MeshSpace.edp"
 
 
-string namewnl3DeltaA="u3-deltaA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
-string namewnl3AAAc="u3-AAAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
-string namewnl3AAAcMean="u3-AAAc-Mean-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
-string namewnl3AAAcHarmo="u3-AAAc-Harmo-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
-string namewnl3AAA="u3-AAA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
-string namewnl3Coeffs="Coeffs-Ordre3-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
-
-string namewnl4DeltaAAc="u4-deltaAAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
-string namewnl4AAcAAc="u4-AAcAAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
-string namewnl4DeltaAA="u4-deltaAA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
-string namewnl4AAAAc="u4-AAAAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
-string namewnl4AAAA="u4-AAAA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
-
-string namewnl5Coeffs="Coeffs-Ordre5-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
-
-
-cout << "-----------------------------------------" << endl;
+cout <<"--------------------------------------------------------------------------" << endl;
+cout <<"--------------------------------------------------------------------------" << endl;
+cout << "-- Weakly NonLinear Analysis of a cross-stream spring-mounted cylinder --" << endl;
+cout << "-- Fifth Order ---------------------------------------------------------- " << endl;
+cout <<"--------------------------------------------------------------------------" << endl;
+cout << "-------------------------------------------------------------------------" << endl;
+cout << "--- mesh   = " << nummesh << endl;
 cout << "--- Re        =  " << Re << endl;
 cout << "--- rhos/rhof =  " << rho << endl;
-cout << "--- omegas    =  " << omegas << endl;
-cout << "-----------------------------------------" << endl;
-
-mesh th=readmesh(pathmesh+namemesh);
-
-fespace fp(th,P1);
-fespace fu(th,P1b);
-fespace fuuppp(th,[P1b,P1b,P1,P1,P1]);
+cout << "--- gammas    =  " << gammas << endl;
+cout << "-------------------------------------------------------" << endl;
 
 fuuppp [ur,vr,pr,fr,gr]; 
 
@@ -118,7 +80,7 @@ real Omega;
 ///////////////////////////
 
 {
- ifstream file(pathbaseflow+namebaseflow);
+ ifstream file(pathsteadysol+namebaseflow);
  file >> u0[];
 };
 
@@ -129,7 +91,7 @@ real Omega;
 complex eig;
 
 {
- ifstream file(pathmode+namemode);
+ ifstream file(patheigenmode+namemode);
  file >> eig ;
  file >> sol ;
 };
@@ -290,7 +252,7 @@ ys44=sol(nft-2); vs44=sol(nft-1);
 
 
 {
-ifstream file(pathmode+namemodeadj);
+ifstream file(patheigenmode+namemodeadj);
  file >> eig ;
  file >> sol ;
 };

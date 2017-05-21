@@ -20,48 +20,64 @@
     7 : int labelwall=2;
     8 : real tolNewton=1.e-12;
     9 :
-   10 : real Re=40; // Nombre de Reynolds
-   11 : real Rep=40;
+   10 : real Re=1; // Nombre de Reynolds
+   11 : real Rep=1;
    12 : real nu=1./Re;
    13 :
    14 :
    15 : real rho=50; // Rapport de densite (solid/fluid)
-   16 : real omegas=0.67; // Nondimensional structural frequency (omegas=2*pi*fs{®GázdA¦\Šj)
-   17 : real domegas=0.01;
-   18 : real omegasmax=0.7;
+   16 : real omegas=0.657; // Nondimensional structural frequency (omegas=2*pi*f{®GázdAÒˆÐs)
+   17 : real domegas=0.1;
+   18 : real omegasmax=0.658;
    19 : real gammas=0.0; // Structural damping coefficient
-   20 : real nev=10; // Nombre de valeurs propres
-   21 : int iwrite=1; // Ecriture vecteur propres
+   20 : real nev=2; // Nombre de valeurs propres
+   21 : int iwrite=0; // Ecriture vecteur propres
    22 : int mode=1;
-   23 : complex shift;
-   24 :
+   23 : int modeadj=1;
+   24 : complex shift;
    25 :
-   26 : cout << "-----------------------------------------" << endl;
-   27 : cout << "--- Re        =  " << Re << endl;
-   28 : cout << "--- rhos/rhof =  " << rho << endl;
-   29 : cout << "--- omegas    =  " << omegas << endl;
-   30 : cout << "-----------------------------------------" << endl;
-   31 :
+   26 :
+   27 : cout << "-----------------------------------------" << endl;
+   28 : cout << "--- Re        =  " << Re << endl;
+   29 : cout << "--- rhos/rhof =  " << rho << endl;
+   30 : cout << "--- omegas    =  " << omegas << endl;
+   31 : cout << "-----------------------------------------" << endl;
    32 :
+   33 :
     3 : include "Name.edp"///////////////////////
     2 : // Name definitions ///
     3 : ///////////////////////
     4 :
     5 : string namemesh="mesh-"+nummesh+".msh";
     6 : string namebaseflow="Baseflow-"+nummesh+"-Re-"+Re+".txt";
-    7 : string namemode="Dir-Mode-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas{®GázdA¦\Šj-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
-    8 :
-    9 : string namewnlAA="u2-AA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"{®GázdA¦\Šj+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
-   10 : string namewnlAAc="u2-AAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas{®GázdA¦\Šj-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
-   11 :
+    7 : string namemode="Dir-Mode-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas{®GázdAÒˆÐ-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
+    8 : string namemodeadj="Adj-Mode-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-ome{®GázdAÒˆÐgas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
+    9 :
+   10 : string namewnl2AA="u2-AA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-{®GázdAÒˆÐ"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   11 : string namewnl2AAc="u2-AAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omega{®GázdAÒˆÐs-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
    12 :
-   13 :
+   13 : string namewnl3DeltaA="u3-deltaA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"{®GázdAÒˆÐ-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   14 : string namewnl3AAAc="u3-AAAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-ome{®GázdAÒˆÐgas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   15 : string namewnl3AAAcMean="u3-AAAc-Mean-Re-"+Re+"-rho-"+rho+"-gammas-"+gam{®GázdAÒˆÐmas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   16 : string namewnl3AAAcHarmo="u3-AAAc-Harmo-Re-"+Re+"-rho-"+rho+"-gammas-"+g{®GázdAÒˆÐammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   17 : string namewnl3AAA="u3-AAA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omega{®GázdAÒˆÐs-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   18 : string namewnl3Coeffs="Coeffs-Ordre3-Re-"+Re+"-rho-"+rho+"-gammas-"+gamm{®GázdAÒˆÐas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
+   19 :
+   20 : string namewnl4DeltaAAc="u4-deltaAAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gamm{®GázdAÒˆÐas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   21 : string namewnl4AAcAAc="u4-AAcAAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"{®GázdAÒˆÐ-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   22 : string namewnl4DeltaAA="u4-deltaAA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas{®GázdAÒˆÐ+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   23 : string namewnl4AAAAc="u4-AAAAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-o{®GázdAÒˆÐmegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   24 : string namewnl4AAAA="u4-AAAA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-ome{®GázdAÒˆÐgas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   25 :
+   26 : string namewnl5Coeffs="Coeffs-Ordre5-Re-"+Re+"-rho-"+rho+"-gammas-"+gamm{®GázdAÒˆÐas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
+   27 :
+   28 :
     4 :
     5 : real Lo=30;
     6 : real Li=20;
     7 : real Lh=20;
     8 :
-    9 : real Lh1=1;
+    9 : real Lh1=1.5;
    10 :
    11 : border bodyr(t=0,pi) { x = 1./2.*cos(t); y= 1./2*sin(t); label=2;}
    12 :
@@ -80,48 +96,50 @@
    25 :
    26 : border down(t=-Li,Lo) { x = t; y= -Lh; label=4;}
    27 :
-   28 : border insidetop0(t=-Li,-1) { x = t; y= Lh1; label=5;}
-   29 : border insidetop1(t=-1,Lo/4) { x = t; y= Lh1; label=5;}
+   28 : border insidetop0(t=-Li,-2) { x = t; y= Lh1; label=5;}
+   29 : border insidetop1(t=-2,Lo/4) { x = t; y= Lh1; label=5;}
    30 : border insidetop2(t=Lo/4,Lo/2) { x = t; y= Lh1; label=5;}
    31 : border insidetop3(t=Lo/2,Lo) { x = t; y= Lh1; label=5;}
    32 :
-   33 : border insidedown0(t=-Li,-1) { x = t; y= -Lh1; label=5;}
-   34 : border insidedown1(t=-1,Lo/4) { x = t; y= -Lh1; label=5;}
+   33 : border insidedown0(t=-Li,-2) { x = t; y= -Lh1; label=5;}
+   34 : border insidedown1(t=-2,Lo/4) { x = t; y= -Lh1; label=5;}
    35 : border insidedown2(t=Lo/4,Lo/2) { x = t; y= -Lh1; label=5;}
    36 : border insidedown3(t=Lo/2,Lo) { x = t; y= -Lh1; label=5;}
    37 :
    38 : border insidemiddle1(t=0.5,Lo/4) { x = t; y= 0; label=5;}
    39 : border insidemiddle2(t=-1,-0.5) { x = t; y= 0; label=5;}
    40 :
-   41 :
-   42 : // densite de points
-   43 : int nf=20;
-   44 : int nm1=15;
-   45 : int nm2=10;
-   46 : int nm3=5;
-   47 : int nc=1;
-   48 :
-   49 : mesh th = buildmesh( right1((Lh-Lh1)*nc)+ right2(2*Lh1*nm3)+ right3((Lh-{®GázdA¦\ŠjLh1)*nc)
-   50 : + top((Lo+Li)*nc*0.5)+left1((Lh-Lh1)*nc*0.5)+left2(2*Lh1*nm3*0.5)+left3({®GázdA¦\Šj(Lh-Lh1)*nc*0.5)+down((Lo+Li)*nc*0.5) + bodyl(-pi*nf*0.5)+ bodyr(-pi*nf*0.5)
-   51 : + insidetop0((Li-1)*nm3)+ insidetop1((Lo/4+1)*nm1)+insidetop2(Lo/4*nm2)+{®GázdA¦\Šjinsidetop3(Lo/2*nm3)
-   52 : + insidedown0((Li-1)*nm3)+ insidedown1((Lo/4+1)*nm1) + insidedown2(Lo/4*{®GázdA¦\Šjnm2)+ insidedown3(Lo/2*nm3)
-   53 : + insidemiddle1((Lo/4-0.5)*nf)+ insidemiddle2(0.5*nf) ) ;
-   54 :
-   55 : plot(th,wait=1);
-   56 : cout << th.nt << " " << th.nv << endl;
-   57 : savemesh(th,pathmesh+"mesh-"+nummesh+".msh");
-   58 :  sizestack + 1024 =2072  ( 1048 )
+   41 : border insideleft(t=-Lh1,Lh1) { x = -2; y= t; label=5;}
+   42 :
+   43 :
+   44 : // densite de points
+   45 : int nf=20;
+   46 : int nm1=15;
+   47 : int nm2=10;
+   48 : int nm3=3;
+   49 : int nc=1;
+   50 :
+   51 : mesh th = buildmesh( right1((Lh-Lh1)*nc)+ right2(2*Lh1*nm3)+ right3((Lh-{®GázdAÒˆÐLh1)*nc)
+   52 : + top((Lo+Li)*nc*0.5)+left1((Lh-Lh1)*nc*0.5)+left2(2*Lh1*nm3*0.5)+left3({®GázdAÒˆÐ(Lh-Lh1)*nc*0.5)+down((Lo+Li)*nc*0.5) + bodyl(-pi*nf*0.5)+ bodyr(-pi*nf*0.5)
+   53 : + insidetop0((Li-1)*nm3)+ insidetop1((Lo/4+1)*nm1)+insidetop2(Lo/4*nm2)+{®GázdAÒˆÐinsidetop3(Lo/2*nm2/1.5)
+   54 : + insidedown0((Li-1)*nm3)+ insidedown1((Lo/4+1)*nm1) + insidedown2(Lo/4*{®GázdAÒˆÐnm2)+ insidedown3(Lo/2*nm2/1.5)
+   55 : + insidemiddle1((Lo/4-0.5)*nf)+ insidemiddle2(0.5*nf) + insideleft(2*Lh1{®GázdAÒˆÐ*nm2) ) ;
+   56 :
+   57 : plot(th,wait=1);
+   58 : cout << th.nt << " " << th.nv << endl;
+   59 : savemesh(th,pathmesh+"mesh-"+nummesh+".msh");
+   60 :  sizestack + 1024 =2512  ( 1488 )
  
 -----------------------------------------
---- Re        =  40
+--- Re        =  1
 --- rhos/rhof =  50
---- omegas    =  0.67
+--- omegas    =  0.657
 -----------------------------------------
-  --  mesh:  Nb of Triangles =  31687, Nb of Vertices 15935
-31687 15935
+  --  mesh:  Nb of Triangles =  42071, Nb of Vertices 21125
+42071 21125
   number of required edges : 0
-times: compile 0.207s, execution 0.76s,  mpirank:0
- ######## We forget of deleting   226 Nb pointer,   0Bytes  ,  mpirank 0, memory{®GázdA¦\Šj leak =0
- CodeAlloc : nb ptr  3558,  size :394960 mpirank: 0
+times: compile 0.29s, execution 0.898s,  mpirank:0
+ ######## We forget of deleting   727 Nb pointer,   0Bytes  ,  mpirank 0, memory{®GázdAÒˆÐ leak =0
+ CodeAlloc : nb ptr  4128,  size :408560 mpirank: 0
 Ok: Normal End
  try getConsole D:\marquet\Desktop\ERC\CODES\WNL\Cylinder-Mesh.edp

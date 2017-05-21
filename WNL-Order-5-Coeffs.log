@@ -1,0 +1,294 @@
+  100 : u1[]=sol(0:nff-1); ys1=sol(nft-2); vs1=sol(nft-1);
+  101 : [u1c,v1c,p1c,f1c,g1c]=[conj(u1),conj(v1),conj(p1),conj(f1),conj(g1)];
+  102 : ys1c=conj(ys1);vs1c=conj(vs1);
+  103 :
+  104 : cout << "eigA= " << eig << endl;
+  105 :
+  106 : [ur,vr,pr,fr,gr]=[real(u1),real(v1),real(p1),real(f1),real(g1)];
+  107 : plot(ur,value=1,wait=1,cmm="u1-r");
+  108 :
+  109 : ///////////////////////////////////////
+  110 : ///// Ordre2:  Mode AAc - 20   ////////
+  111 : ///////////////////////////////////////
+  112 :
+  113 : {
+  114 : ifstream file(pathwnl+namewnl2AAc);
+  115 : file >> sol ;
+  116 : };
+  117 :
+  118 : u20[]=sol(0:nff-1); ys20=sol(nft-2); vs20=sol(nft-1);
+  119 :
+  120 : ///////////////////////////////////////
+  121 : ///// Ordre2:  Mode AA - 22    ////////
+  122 : ///////////////////////////////////////
+  123 :
+  124 : {
+  125 : ifstream file(pathwnl+namewnl2AA);
+  126 : file >> sol ;
+  127 : };
+  128 :
+  129 : u22[]=sol(0:nff-1); ys22=sol(nft-2); vs22=sol(nft-1);
+  130 :
+  131 : [u22c,v22c,p22c,f22c,g22c]=[conj(u22),conj(v22),conj(p22),conj(f22),conj{®GázdA°]<¢(g22)];
+  132 : ys22c=conj(ys22);vs22c=conj(vs22);
+  133 :
+  134 :
+  135 : ///////////////////////////////////////
+  136 : ///// Ordre3:  Mode deltaA  - 311  ////
+  137 : ///////////////////////////////////////
+  138 :
+  139 : {
+  140 : ifstream file(pathwnl+namewnl3DeltaA);
+  141 : file >> solaug ;
+  142 : };
+  143 :
+  144 : u311[]=solaug(0:nff-1);
+  145 : ys311=solaug(nft-2); vs311=solaug(nft-1);
+  146 :
+  147 :
+  148 : [u311c,v311c,p311c,f311c,g311c]=[conj(u311),conj(v311),conj(p311),conj(f{®GázdA°]<¢311),conj(g311)];
+  149 : ys311c=conj(ys311);vs311c=conj(vs311);
+  150 :
+  151 :
+  152 : ///////////////////////////////////////
+  153 : ///// Ordre3:  Mode AAAc  - 313  //////
+  154 : ///////////////////////////////////////
+  155 :
+  156 : {
+  157 : ifstream file(pathwnl+namewnl3AAAc);
+  158 : file >> solaug ;
+  159 : };
+  160 :
+  161 : u313[]=solaug(0:nff-1);
+  162 : ys313=solaug(nft-2); vs313=solaug(nft-1);
+  163 :
+  164 :
+  165 : [u313c,v313c,p313c,f313c,g313c]=[conj(u313),conj(v313),conj(p313),conj(f{®GázdA°]<¢313),conj(g313)];
+  166 : ys313c=conj(ys313);vs313c=conj(vs313);
+  167 :
+  168 :
+  169 : ///////////////////////////////////////
+  170 : ///// Ordre3:  Mode AAA  - 33    //////
+  171 : ///////////////////////////////////////
+  172 :
+  173 : {
+  174 : ifstream file(pathwnl+namewnl3AAA);
+  175 : file >> sol ;
+  176 : };
+  177 :
+  178 : u33[]=sol(0:nff-1);
+  179 : ys33=sol(nft-2); vs33=sol(nft-1);
+  180 :
+  181 :
+  182 : [u33c,v33c,p33c,f33c,g33c]=[conj(u33),conj(v33),conj(p33),conj(f33),conj{®GázdA°]<¢(g33)];
+  183 : ys33c=conj(ys33);vs33c=conj(vs33);
+  184 :
+  185 :
+  186 : /////////////////////////////////////////////
+  187 : ///// Ordre4:  Mode deltaAAc  - 402    //////
+  188 : ///////////////////////////////////////
+  189 :
+  190 : {
+  191 : ifstream file(pathwnl+namewnl4DeltaAAc);
+  192 : file >> sol ;
+  193 : };
+  194 :
+  195 : u402[]=sol(0:nff-1);
+  196 : ys402=sol(nft-2); vs402=sol(nft-1);
+  197 :
+  198 :
+  199 : /////////////////////////////////////////////
+  200 : ///// Ordre4:  Mode AAcAAc  - 404    //////
+  201 : ///////////////////////////////////////
+  202 :
+  203 : {
+  204 : ifstream file(pathwnl+namewnl4AAcAAc);
+  205 : file >> sol ;
+  206 : };
+  207 :
+  208 : u404[]=sol(0:nff-1);
+  209 : ys404=sol(nft-2); vs404=sol(nft-1);
+  210 :
+  211 : ////////////////////////////////////////////
+  212 : ///// Ordre4:  Mode deltaAA  - 422    //////
+  213 : ///////////////////////////////////////
+  214 :
+  215 : {
+  216 : ifstream file(pathwnl+namewnl4DeltaAA);
+  217 : file >> sol ;
+  218 : };
+  219 :
+  220 : u422[]=sol(0:nff-1);
+  221 : ys422=sol(nft-2); vs422=sol(nft-1);
+  222 :
+  223 :
+  224 : ////////////////////////////////////////////
+  225 : ///// Ordre4:  Mode AAAAc  - 424    //////
+  226 : ///////////////////////////////////////
+  227 :
+  228 : {
+  229 : ifstream file(pathwnl+namewnl4AAAAc);
+  230 : file >> sol ;
+  231 : };
+  232 :
+  233 : u424[]=sol(0:nff-1);
+  234 : ys424=sol(nft-2); vs424=sol(nft-1);
+  235 :
+  236 : ////////////////////////////////////////////
+  237 : ///// Ordre4:  Mode AAAA  - 44    //////
+  238 : ///////////////////////////////////////
+  239 :
+  240 : {
+  241 : ifstream file(pathwnl+namewnl4AAAA);
+  242 : file >> sol ;
+  243 : };
+  244 :
+  245 : u44[]=sol(0:nff-1);
+  246 : ys44=sol(nft-2); vs44=sol(nft-1);
+  247 :
+  248 :
+  249 : ////////////////////////////////
+  250 : ///// Adjoint  Mode A   ///////
+  251 : ///////////////////////////////
+  252 :
+  253 :
+  254 : {
+  255 : ifstream file(patheigenmode+namemodeadj);
+  256 :  file >> eig ;
+  257 :  file >> sol ;
+  258 : };
+  259 :
+  260 : au1[]=sol(0:nff-1); ays1=sol(nft-2); avs1=sol(nft-1);
+  261 :
+  262 :
+  263 : cout << "Adj-eigA= " << eig << endl;
+  264 :
+  265 : complex Normeaf,Normeas,Normea;
+  266 :
+  267 : Normeaf=int2d(th)(conj(au1)*u1+conj(av1)*v1);
+  268 : Normeas=conj(ays1)*ys1+conj(avs1)*vs1;
+  269 :
+  270 : Normea=Normeaf+Normeas;
+  271 :
+  272 : au1[]*=1/conj(Normea);
+  273 : ays1*=1./conj(Normea);
+  274 : avs1*=1./conj(Normea);
+  275 :
+  276 : Normeaf=int2d(th)(conj(au1)*u1+conj(av1)*v1);
+  277 : Normeas=conj(ays1)*ys1+conj(avs1)*vs1;
+  278 :
+  279 : Normea=Normeaf+Normeas;
+  280 :
+  281 : cout << "Normeaf= " << Normeaf << endl;
+  282 : cout << "Normeas= " << Normeas << endl;
+  283 : cout << "Normea= " << Normea << endl;
+  284 :
+  285 : [ur,vr,pr,fr,gr]=[real(au1),real(av1),real(ap1),real(af1),real(ag1)];
+  286 : plot(ur,value=1,wait=1,cmm="Adj-u1-r");
+  287 :
+  288 :
+  289 : complex alpha1=-conj(avs1)*(ys311);
+  290 : complex beta1=-conj(avs1)*(ys313);
+  291 :
+  292 :
+  293 : cout << "-------------------------------------" << endl;
+  294 : cout << "alpha-1  = " << alpha1 << endl;
+  295 : cout << "beta-1   = " << beta1 << endl;
+  296 : cout << "-------------------------------------" << endl;
+  297 :
+  298 : complex beta2,gamma;
+  299 :
+  300 : beta2=-int2d(th)(
+  301 : conj(au1)*( u22*dx(u311c)+v22*dy(u311c) )
+  302 : +conj(au1)*( u311c*dx(u22)+v311c*dy(u22) )
+  303 : +conj(au1)*( u20*dx(u311)+v20*dy(u311) )
+  304 : +conj(au1)*( u311*dx(u20)+v311*dy(u20) )
+  305 : +conj(au1)*( u402*dx(u1)+v402*dy(u1) )
+  306 : +conj(au1)*( u1*dx(u402)+v1*dy(u402) )
+  307 : +conj(au1)*( u422*dx(u1c)+v422*dy(u1c) )
+  308 : +conj(au1)*( u1c*dx(u422)+v1c*dy(u422) )
+  309 : +conj(av1)*( u22*dx(v311c)+v22*dy(v311c) )
+  310 : +conj(av1)*( u311c*dx(v22)+v311c*dy(v22) )
+  311 : +conj(av1)*( u20*dx(v311)+v20*dy(v311) )
+  312 : +conj(av1)*( u311*dx(v20)+v311*dy(v20) )
+  313 : +conj(av1)*( u402*dx(v1)+v402*dy(v1) )
+  314 : +conj(av1)*( u1*dx(v402)+v1*dy(v402) )
+  315 : +conj(av1)*( u422*dx(v1c)+v422*dy(v1c) )
+  316 : +conj(av1)*( u1c*dx(v422)+v1c*dy(v422) )
+  317 : );
+  318 :
+  319 :
+  320 : gamma=-int2d(th)(
+  321 : conj(au1)*( u22*dx(u313c)+v22*dy(u313c) )
+  322 : +conj(au1)*( u313c*dx(u22)+v313c*dy(u22) )
+  323 : +conj(au1)*( u20*dx(u313)+v20*dy(u313) )
+  324 : +conj(au1)*( u313*dx(u20)+v313*dy(u20) )
+  325 : +conj(au1)*( u22c*dx(u33)+v22c*dy(u33) )
+  326 : +conj(au1)*( u33c*dx(u22c)+v33*dy(u22c) )
+  327 : +conj(au1)*( u404*dx(u1)+v404*dy(u1) )
+  328 : +conj(au1)*( u1*dx(u404)+v1*dy(u404) )
+  329 : +conj(au1)*( u424*dx(u1c)+v424*dy(u1c) )
+  330 : +conj(au1)*( u1c*dx(u424)+v1c*dy(u424) )
+  331 : +conj(av1)*( u22*dx(v313c)+v22*dy(v313c) )
+  332 : +conj(av1)*( u313c*dx(v22)+v313c*dy(v22) )
+  333 : +conj(av1)*( u20*dx(v313)+v20*dy(v313) )
+  334 : +conj(av1)*( u313*dx(v20)+v313*dy(v20) )
+  335 : +conj(av1)*( u22c*dx(v33)+v22c*dy(v33) )
+  336 : +conj(av1)*( u33c*dx(v22c)+v33*dy(v22c) )
+  337 : +conj(av1)*( u404*dx(v1)+v404*dy(v1) )
+  338 : +conj(av1)*( u1*dx(v404)+v1*dy(v404) )
+  339 : +conj(av1)*( u424*dx(v1c)+v424*dy(v1c) )
+  340 : +conj(av1)*( u1c*dx(v424)+v1c*dy(v424) )
+  341 : );
+  342 :
+  343 : cout << "-------------------------------------" << endl;
+  344 : cout << "beta-2  = " << beta2 << endl;
+  345 : cout << "gamma   = " << gamma << endl;
+  346 : cout << "-------------------------------------" << endl;
+  347 :
+  348 : {
+  349 : ofstream file(pathwnl+namewnl5Coeffs);
+  350 : file << alpha1 << endl;
+  351 : file << beta1 << endl;
+  352 : file << beta2 << endl;
+  353 : file << gamma << endl;
+  354 : };
+  355 :
+  356 :
+  357 :  sizestack + 1024 =10376  ( 9352 )
+ 
+-----------------------------------------
+--- Re        =  40
+--- rhos/rhof =  50
+--- omegas    =  0.657
+-----------------------------------------
+  --  mesh:  Nb of Triangles =  42071, Nb of Vertices 21125
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+-- Weakly NonLinear Analysis of a cross-stream spring-mounted cylinder --
+-- Fifth Order ----------------------------------------------------------
+--------------------------------------------------------------------------
+-------------------------------------------------------------------------
+--- mesh   = 22
+--- Re        =  40
+--- rhos/rhof =  50
+--- gammas    =  0
+-------------------------------------------------------
+eigA= (-8.0678e-007,0.662755)
+Adj-eigA= (-8.0678e-007,-0.662755)
+Normeaf= (-0.141687,0.133512)
+Normeas= (1.14169,-0.133512)
+Normea= (1,-1.52656e-015)
+-------------------------------------
+alpha-1  = (1.94554,0.246239)
+beta-1   = (-0.011759,-0.0235664)
+-------------------------------------
+-------------------------------------
+beta-2  = (-0.0323387,-0.0457554)
+gamma   = (0.00064275,0.0013825)
+-------------------------------------
+times: compile 0.971s, execution 68.357s,  mpirank:0
+ ######## We forget of deleting   908 Nb pointer,   0Bytes  ,  mpirank 0, memory{®GázdA°]<¢ leak =0
+ CodeAlloc : nb ptr  4953,  size :419304 mpirank: 0
+Ok: Normal End
+ try getConsole D:\marquet\Desktop\ERC\CODES\WNL\WNL-Order-5-Coeffs.edp

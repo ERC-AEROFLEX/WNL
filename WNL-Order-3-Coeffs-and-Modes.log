@@ -1,44 +1,3 @@
-  249 :
-  250 : rhsaug=0.;
-  251 : rhsaug(nft-1)=-ys1A;
-  252 :
-  253 : cout << "Resolution " << endl;
-  254 : solaug=A^-1*rhsaug;
-  255 :
-  256 : complex alpha=solaug(nft);
-  257 :
-  258 : cout << "alpha= " << alpha << endl;
-  259 :
-  260 : u311[]=solaug(0:nft-1);
-  261 : cout << " ys= " << solaug(nft-2) << endl;
-  262 : cout << " vs= " << solaug(nft-1) << endl;
-  263 : cout << " Fy= " << int1d(th,2)(g311) << endl;
-  264 : [ur,vr,pr,fr,gr]=[real(u311),real(v311),real(p311),real(f311),real(g311){®GázdA–µïK/];
-  265 : plot(ur,value=1,wait=1,cmm="Mode3-deltaA");
-  266 :
-  267 :
-  268 : {
-  269 : ofstream file(pathwnl+namewnl3DeltaA);
-  270 : file << solaug << endl;
-  271 : };
-  272 :
-  273 :
-  274 : cout << "Construction vecteur - Coeff Mean Flow " << endl;
-  275 :
-  276 : {
-  277 :  varf vrhs([u,v,p,f,g],[ut,vt,pt,ft,gt]) =
-  278 :  int2d(th)(-( u1A*dx(u2AAc) + (v1A-vs1A)*dy(u2AAc) )*ut
-  279 :            -( u1A*dx(v2AAc) + (v1A-vs1A)*dy(v2AAc) )*vt
-  280 :            -( u2AAc*dx(u1A) + (v2AAc-vs2AAc)*dy(u1A) )*ut
-  281 :            -( u2AAc*dx(v1A) + (v2AAc-vs2AAc)*dy(v1A) )*vt
-  282 :            )+on(4,v=0.)+on(1,u=0.,v=0.);
-  283 :
-  284 :
-  285 : fuuppp<complex> [ru,rv,rp,rf,rg];
-  286 : rhsaug=0.0;
-  287 : ru[]=vrhs(0,fuuppp,tgv=1);
-  288 : rhsaug(0:nft-3)=ru[];
-  289 : };
   290 :
   291 : cout << "Fin Construction vecteur " << endl;
   292 :
@@ -125,7 +84,7 @@
   373 : cout << " ys= " << solaug(nft-2) << endl;
   374 : cout << " vs= " << solaug(nft-1) << endl;
   375 : cout << " Fy= " << int1d(th,2)(g313) << endl;
-  376 : [ur,vr,pr,fr,gr]=[real(u313),real(v313),real(p313),real(f313),real(g313){®GázdA–µïK/];
+  376 : [ur,vr,pr,fr,gr]=[real(u313),real(v313),real(p313),real(f313),real(g313){®GázdAÕÉÉ±];
   377 : plot(ur,value=1,wait=1,cmm="Mode3-AAAc");
   378 :
   379 :
@@ -175,7 +134,7 @@
   423 :  fsu0[]=0.; fsu1[]=vvs(0,fuuppp,tgv=1);
   424 :
   425 : // Matrix Solid/Fluid
-  426 : varf vfy([u,v,p,f,g],[ut,vt,pt,ft,gt]) = int1d(th,2)( -(4./pi/rho)*gt );{®GázdA–µïK/ 
+  426 : varf vfy([u,v,p,f,g],[ut,vt,pt,ft,gt]) = int1d(th,2)( -(4./pi/rho)*gt );{®GázdAÕÉÉ± 
   427 :
   428 :  rsu0[]=0.; rsu1[]=vfy(0,fuuppp);
   429 :
@@ -265,14 +224,14 @@
   513 :
   514 :
   515 :
-  516 :  sizestack + 1024 =27736  ( 26712 )
+  516 :  sizestack + 1024 =28016  ( 26992 )
  
 -----------------------------------------
 --- Re        =  40
 --- rhos/rhof =  50
---- omegas    =  0.67
+--- omegas    =  0.657
 -----------------------------------------
-  --  mesh:  Nb of Triangles =  31687, Nb of Vertices 15935
+  --  mesh:  Nb of Triangles =  42071, Nb of Vertices 21125
 --------------------------------------------------------------------------
 --------------------------------------------------------------------------
 -- Weakly NonLinear Analysis of a cross-stream spring-mounted cylinder --
@@ -284,11 +243,53 @@
 --- rhos/rhof =  50
 --- gammas    =  0
 -------------------------------------------------------
- Error openning file ./data/eigenmodes/Dir-Mode-Re-40-rho-50-gammas-0-omegas-0.6{®GázdA–µïK/7-mesh-22-num-1.dat
-  current line = 79
-Exec error : Error openning file
-   -- number :1
-Exec error : Error openning file
-   -- number :1
- err code 7 ,  mpirank 0
- try getConsole D:\marquet\Desktop\ERC\CODES\WNL\WNL-Order-3-Coeffs-and-Modes.ed{®GázdA–µïK/p
+eigA= (-8.0678e-007,0.662755)
+Adj-eigA= (-8.0678e-007,-0.662755)
+Normeaf= (-0.141687,0.133512)
+Normeas= (1.14169,-0.133512)
+Normea= (1,-1.52656e-015)
+Construction matrice - u31
+Assemblage matrice
+  -- Block Matrix NxM = 4x4    nxm  =189770x189770 nb  none zero coef. 3659323
+Fin Construction matrice
+Factorisation matrice
+Construction vecteur - Coeff Lineaire
+Resolution
+alpha= (0.101604,0.86883)
+ ys= (0.00414187,0.0222502)
+ vs= (-0.0193078,-0.0048168)
+ Fy= (0.0314211,-0.0801113)
+Construction vecteur - Coeff Mean Flow
+Fin Construction vecteur
+Resolution
+beta-mean= (-3.62485e-005,0.00153462)
+Construction vecteur - Coeff Harmonic
+Fin Construction vecteur
+Resolution
+beta-harmo= (0.000130956,0.000172621)
+beta-mean+harmo = (9.47079e-005,0.00170725)
+Construction vecteur - Coeff Total
+Fin Construction vecteur
+Resolution
+beta= (9.47079e-005,0.00170725)
+ ys= (0.000217627,-0.000212197)
+ vs= (0.000148633,0.000159531)
+ Fy= (-0.000861166,0.000479623)
+--------------------------------
+--------------------------------
+Construction matrice - u33
+Assemblage matrice
+  -- Block Matrix NxM = 3x3    nxm  =189769x189769 nb  none zero coef. 3406534
+Fin Construction matrice
+Factorisation matrice
+Construction vecteur - A^3
+Fin Construction vecteur
+Resolution
+ ys= (1.91572e-008,-1.55639e-008)
+ vs= (1.0315e-008,1.26965e-008)
+ Fy= (-5.71387e-009,4.64212e-009)
+times: compile 0.923s, execution 109.943s,  mpirank:0
+ ######## We forget of deleting   1075 Nb pointer,   0Bytes  ,  mpirank 0, memor{®GázdAÕÉÉ±y leak =0
+ CodeAlloc : nb ptr  6099,  size :500392 mpirank: 0
+Ok: Normal End
+ try getConsole D:\marquet\Desktop\ERC\CODES\WNL\WNL-Order-3-Coeffs-and-Modes.ed{®GázdAÕÉÉ±p

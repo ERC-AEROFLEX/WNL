@@ -13,13 +13,14 @@ real nu=1./Re;
 
 
 real rho=50; // Rapport de densite (solid/fluid)
-real omegas=0.67; // Nondimensional structural frequency (omegas=2*pi*fs)
-real domegas=0.01;
-real omegasmax=0.7;
+real omegas=0.657; // Nondimensional structural frequency (omegas=2*pi*fs)
+real domegas=0.1;
+real omegasmax=0.658;
 real gammas=0.0; // Structural damping coefficient
-real nev=10; // Nombre de valeurs propres
-int iwrite=1; // Ecriture vecteur propres
+real nev=2; // Nombre de valeurs propres
+int iwrite=0; // Ecriture vecteur propres
 int mode=1;
+int modeadj=1;
 complex shift;
 
 

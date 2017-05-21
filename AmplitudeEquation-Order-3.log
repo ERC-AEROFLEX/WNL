@@ -1,0 +1,187 @@
+-- FreeFem++ v  3.530000 (date mar. 25 avr. 2017 10:07:35)
+ Load: lg_fem lg_mesh lg_mesh3 eigenvalue
+    1 : load "MUMPS_seq"(load: loadLibary C:\Program Files (x86)\FreeFem++\\.\MUMPS_seq = 0)
+    2 :
+    3 :
+    4 : real rho=50;
+    5 : real Re=40;
+    6 : real Rec=40;
+    7 : real omegasc=0.657;
+    8 : real gammas=0.0;
+    9 : int nummesh=22;
+   10 :
+   11 : real omegasmin=0.5;
+   12 : real domegas=0.001;
+   13 : real omegasmax=0.8;
+   14 : real omegas=omegasmin;
+   15 :
+   16 :
+   17 : int mode=1;
+   18 : int modeadj=1;
+   19 :
+   20 : complex alpha,alpha1,beta,beta1,beta2,gamma;
+   21 : complex alphat,betat;
+   22 : complex eig;
+   23 : real lambdac,omegac;
+   24 :
+   25 : include "Path.edp"///////////////////////
+    2 : //  Path definition ///
+    3 : ///////////////////////
+    4 :
+    5 : string pathmesh="./data/mesh/";
+    6 : string pathsteadysol="./data/steadysolution/";
+    7 : string patheigenmode="./data/eigenmodes/";
+    8 : string pathwnl="./data/weaklynonlinear/";
+    9 :
+   10 :
+   11 :
+   26 : include "Name.edp"///////////////////////
+    2 : // Name definitions ///
+    3 : ///////////////////////
+    4 :
+    5 : string namemesh="mesh-"+nummesh+".msh";
+    6 : string namebaseflow="Baseflow-"+nummesh+"-Re-"+Re+".txt";
+    7 : string namemode="Dir-Mode-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
+    8 : string namemodeadj="Adj-Mode-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
+    9 :
+   10 : string namemodec="Dir-Mode-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
+   11 : string namemodecadj="Adj-Mode-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
+   12 :
+   13 :
+   14 : string namewnl2AA="u2-AA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   15 : string namewnl2AAc="u2-AAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   16 :
+   17 : string namewnl3DeltaA="u3-deltaA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   18 : string namewnl3AAAc="u3-AAAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   19 : string namewnl3AAAcMean="u3-AAAc-Mean-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   20 : string namewnl3AAAcHarmo="u3-AAAc-Harmo-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   21 : string namewnl3AAA="u3-AAA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   22 : string namewnl3Coeffs="Coeffs-Ordre3-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
+   23 :
+   24 : string nameeig3="Eigenvalue-Ordre3-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
+   25 : string nameampli3="Amplitude-Ordre3-Ordre5-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
+   26 :
+   27 : string namewnl4DeltaAAc="u4-deltaAAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   28 : string namewnl4AAcAAc="u4-AAcAAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   29 : string namewnl4DeltaAA="u4-deltaAA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   30 : string namewnl4AAAAc="u4-AAAAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   31 : string namewnl4AAAA="u4-AAAA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   32 :
+   33 : string namewnl5Coeffs="Coeffs-Ordre5-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
+   34 :
+   35 :
+   27 : include "MeshSpace.edp"//////////////////////
+    2 : // Mesh and Spaces ///
+    3 : //////////////////////
+    4 :
+    5 : mesh th=readmesh(pathmesh+namemesh);
+    6 :
+    7 : fespace fp(th,P1);
+    8 : fespace fu(th,P1b);
+    9 : fespace fuuppp(th,[P1b,P1b,P1,P1,P1]);
+   10 :
+   11 :
+   28 :
+   29 :
+   30 :
+   31 : complex ysd,vsd;
+   32 : int ndoff=fuuppp.ndof;
+   33 : int ndoft=ndoff+2;
+   34 : complex[int] vect(ndoft);
+   35 :
+   36 : {
+   37 : ifstream filev(patheigenmode+namemode);
+   38 : filev >> eig ;
+   39 : filev >> vect(:) ;
+   40 : };
+   41 :
+   42 : lambdac=real(eig); omegac=imag(eig);
+   43 : ysd=vect(ndoff);
+   44 :
+   45 :
+   46 : {
+   47 : ifstream file(pathwnl+namewnl3Coeffs);
+   48 : file >> alpha ;
+   49 : file >> beta ;
+   50 : };
+   51 :
+   52 :
+   53 : cout << "ksc      = " << omegasc << endl;
+   54 : cout << "omegac   = " << omegac << endl;
+   55 : cout << "alpha    = " << alpha << endl;
+   56 : cout << "beta     = " << beta << endl;
+   57 : cout << "abs(ysd) = " << abs(ysd) << endl;
+   58 :
+   59 :
+   60 : //////////////////   Lineaire /////////////////////////
+   61 :
+   62 : {
+   63 : ofstream file3(pathwnl+nameeig3);
+   64 :
+   65 :
+   66 : real lambda,omega;
+   67 :
+   68 : while(omegas<=omegasmax)
+   69 : {
+   70 :
+   71 :  lambda=(omegas*omegas-omegasc*omegasc)*real(alpha);
+   72 :  omega=omegac+(omegas*omegas-omegasc*omegasc)*imag(alpha);
+   73 :
+   74 :  file3 << omegas << " " << lambda << " " << omega << endl;
+   75 :
+   76 :  omegas+=domegas;
+   77 :
+   78 : };
+   79 :
+   80 : };
+   81 :
+   82 :
+   83 :
+   84 : real Delta;
+   85 : real Xp,Xm,Ap,Am;
+   86 :
+   87 : //////////////  Non lineaire - Ordre3  //////////////////////
+   88 :
+   89 : real omegal,omeganl,ysmax;
+   90 :
+   91 : omegas=omegasmin;
+   92 :
+   93 :
+   94 : {
+   95 : ofstream file3(pathwnl+nameampli3);
+   96 :
+   97 :
+   98 : while(omegas<=omegasmax)
+   99 : {
+  100 :
+  101 :  Ap=real(alpha)/real(beta)*(omegas*omegas-omegasc*omegasc);
+  102 :
+  103 :  if(Ap>=0)
+  104 :  {
+  105 :  omegal=omegac+(omegas*omegas-omegasc*omegasc)*imag(alpha);
+  106 :  omeganl=omegal-imag(beta)*Ap;
+  107 :  ysmax=2*sqrt(Ap)*abs(ysd);
+  108 :
+  109 :  file3 << omegas << " " << sqrt(Ap) << " " << -sqrt(Ap) << " " << omeganl << endl;
+  110 :
+  111 :
+  112 :  };
+  113 :
+  114 :  omegas+=domegas;
+  115 :
+  116 : };
+  117 :
+  118 :
+  119 : };
+  120 :
+  121 :  sizestack + 1024 =3768  ( 2744 )
+ 
+  --  mesh:  Nb of Triangles =  42071, Nb of Vertices 21125
+ Error openning file ./data/eigenmodes/Dir-Mode-Re-40-rho-50-gammas-0-omegas-0.5-mesh-22-num-1.dat
+  current line = 37
+Exec error : Error openning file
+   -- number :1
+Exec error : Error openning file
+   -- number :1
+ err code 7 ,  mpirank 0
+ try getConsole D:\marquet\Desktop\ERC\CODES\WNL\AmplitudeEquation-Order-3.edp

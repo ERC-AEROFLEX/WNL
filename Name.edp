@@ -7,6 +7,10 @@ string namebaseflow="Baseflow-"+nummesh+"-Re-"+Re+".txt";
 string namemode="Dir-Mode-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
 string namemodeadj="Adj-Mode-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
 
+string namemodec="Dir-Mode-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
+string namemodecadj="Adj-Mode-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
+
+
 string namewnl2AA="u2-AA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
 string namewnl2AAc="u2-AAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
 
@@ -16,3 +20,15 @@ string namewnl3AAAcMean="u3-AAAc-Mean-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-om
 string namewnl3AAAcHarmo="u3-AAAc-Harmo-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
 string namewnl3AAA="u3-AAA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
 string namewnl3Coeffs="Coeffs-Ordre3-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
+
+string nameeig3="Eigenvalue-Ordre3-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
+string nameampli3="Amplitude-Ordre3-Ordre5-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
+
+string namewnl4DeltaAAc="u4-deltaAAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+string namewnl4AAcAAc="u4-AAcAAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+string namewnl4DeltaAA="u4-deltaAA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+string namewnl4AAAAc="u4-AAAAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+string namewnl4AAAA="u4-AAAA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+
+string namewnl5Coeffs="Coeffs-Ordre5-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
+

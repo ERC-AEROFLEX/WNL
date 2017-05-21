@@ -7,7 +7,7 @@
     3 : cout << "-------------------------------------------------
   ... : ---" << endl;
     4 :
-    5 : load "MUMPS_seq"(load: loadLibary C:\Program Files (x86)\FreeFem++\\.\MUX×MPS_seq = 0)
+    5 : load "MUMPS_seq"(load: loadLibary C:\Program Files (x86)\FreeFem++\\.\MU{®GázdAØš;5jMPS_seq = 0)
     6 :
     7 :
     8 : include "Path.edp"///////////////////////
@@ -31,41 +31,57 @@
     8 : real tolNewton=1.e-12;
     9 :
    10 : real Re=40; // Nombre de Reynolds
-   11 : real Rep=40;
+   11 : real Rep=10;
    12 : real nu=1./Re;
    13 :
    14 :
    15 : real rho=50; // Rapport de densite (solid/fluid)
-   16 : real omegas=0.67; // Nondimensional structural frequency (omegas=2*pi*fsX×)
-   17 : real domegas=0.01;
-   18 : real omegasmax=0.7;
+   16 : real omegas=0.657; // Nondimensional structural frequency (omegas=2*pi*f{®GázdAØš;5js)
+   17 : real domegas=0.1;
+   18 : real omegasmax=0.658;
    19 : real gammas=0.0; // Structural damping coefficient
-   20 : real nev=10; // Nombre de valeurs propres
-   21 : int iwrite=1; // Ecriture vecteur propres
+   20 : real nev=2; // Nombre de valeurs propres
+   21 : int iwrite=0; // Ecriture vecteur propres
    22 : int mode=1;
-   23 : complex shift;
-   24 :
+   23 : int modeadj=1;
+   24 : complex shift;
    25 :
-   26 : cout << "-----------------------------------------" << endl;
-   27 : cout << "--- Re        =  " << Re << endl;
-   28 : cout << "--- rhos/rhof =  " << rho << endl;
-   29 : cout << "--- omegas    =  " << omegas << endl;
-   30 : cout << "-----------------------------------------" << endl;
-   31 :
+   26 :
+   27 : cout << "-----------------------------------------" << endl;
+   28 : cout << "--- Re        =  " << Re << endl;
+   29 : cout << "--- rhos/rhof =  " << rho << endl;
+   30 : cout << "--- omegas    =  " << omegas << endl;
+   31 : cout << "-----------------------------------------" << endl;
    32 :
+   33 :
    10 : include "Name.edp"///////////////////////
     2 : // Name definitions ///
     3 : ///////////////////////
     4 :
     5 : string namemesh="mesh-"+nummesh+".msh";
     6 : string namebaseflow="Baseflow-"+nummesh+"-Re-"+Re+".txt";
-    7 : string namemode="Dir-Mode-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegasX×-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
-    8 :
-    9 : string namewnlAA="u2-AA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"X×+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
-   10 : string namewnlAAc="u2-AAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegasX×-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
-   11 :
+    7 : string namemode="Dir-Mode-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas{®GázdAØš;5j-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
+    8 : string namemodeadj="Adj-Mode-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-ome{®GázdAØš;5jgas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
+    9 :
+   10 : string namewnl2AA="u2-AA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-{®GázdAØš;5j"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   11 : string namewnl2AAc="u2-AAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omega{®GázdAØš;5js-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
    12 :
-   13 :
+   13 : string namewnl3DeltaA="u3-deltaA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"{®GázdAØš;5j-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   14 : string namewnl3AAAc="u3-AAAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-ome{®GázdAØš;5jgas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   15 : string namewnl3AAAcMean="u3-AAAc-Mean-Re-"+Re+"-rho-"+rho+"-gammas-"+gam{®GázdAØš;5jmas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   16 : string namewnl3AAAcHarmo="u3-AAAc-Harmo-Re-"+Re+"-rho-"+rho+"-gammas-"+g{®GázdAØš;5jammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   17 : string namewnl3AAA="u3-AAA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omega{®GázdAØš;5js-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   18 : string namewnl3Coeffs="Coeffs-Ordre3-Re-"+Re+"-rho-"+rho+"-gammas-"+gamm{®GázdAØš;5jas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
+   19 :
+   20 : string namewnl4DeltaAAc="u4-deltaAAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gamm{®GázdAØš;5jas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   21 : string namewnl4AAcAAc="u4-AAcAAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"{®GázdAØš;5j-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   22 : string namewnl4DeltaAA="u4-deltaAA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas{®GázdAØš;5j+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   23 : string namewnl4AAAAc="u4-AAAAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-o{®GázdAØš;5jmegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   24 : string namewnl4AAAA="u4-AAAA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-ome{®GázdAØš;5jgas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+   25 :
+   26 : string namewnl5Coeffs="Coeffs-Ordre5-Re-"+Re+"-rho-"+rho+"-gammas-"+gamm{®GázdAØš;5jas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
+   27 :
+   28 :
    11 : include "MeshSpace.edp"//////////////////////
     2 : // Mesh and Spaces ///
     3 : //////////////////////
@@ -92,7 +108,7 @@
    24 :         fuupppr [u0r,v0r,p0r,f0r,g0r];
    25 :
    26 :         {
-   27 :         ifstream file(pathsteadysol+"Baseflow-"+nummeshp+"-Re-"+Rep+".txX×t");
+   27 :         ifstream file(pathsteadysol+"Baseflow-"+nummeshp+"-Re-"+Rep+".tx{®GázdAØš;5jt");
    28 :         file >> u0r[];
    29 :         };
    30 :
@@ -107,7 +123,7 @@
    39 :         else
    40 :         {
    41 :         {
-   42 :         ifstream file(pathsteadysol+"Baseflow-"+nummesh+"-Re-"+Rep+".txtX×");
+   42 :         ifstream file(pathsteadysol+"Baseflow-"+nummesh+"-Re-"+Rep+".txt{®GázdAØš;5j");
    43 :         file >> u0[];
    44 :         };
    45 :         };
@@ -115,9 +131,9 @@
    47 :
    48 :
    49 : varf vmat([du,dv,dp,df,dg],[ut,vt,pt,ft,gt])=
-   50 :  int2d(th)( ( du*dx(u0)+dv*dy(u0) + (u0-us0)*dx(du)+(v0-vs0)*dy(du) )*utX× 
-   51 :           + ( du*dx(v0)+dv*dy(v0) + (u0-us0)*dx(dv)+(v0-vs0)*dy(dv) )*vtX× 
-   52 :           + nu*(dx(du)*dx(ut)+dy(du)*dy(ut)+dx(dv)*dx(vt)+dy(dv)*dy(vt))X× 
+   50 :  int2d(th)( ( du*dx(u0)+dv*dy(u0) + (u0-us0)*dx(du)+(v0-vs0)*dy(du) )*ut{®GázdAØš;5j 
+   51 :           + ( du*dx(v0)+dv*dy(v0) + (u0-us0)*dx(dv)+(v0-vs0)*dy(dv) )*vt{®GázdAØš;5j 
+   52 :           + nu*(dx(du)*dx(ut)+dy(du)*dy(ut)+dx(dv)*dx(vt)+dy(dv)*dy(vt)){®GázdAØš;5j 
    53 :           - (dx(ut)+dy(vt))*dp
    54 :           - (dx(du)+dy(dv))*pt +(dp*pt+df*ft+dg*gt)*1.e-16)
    55 :         + int1d(th,2)(df*ut + dg*vt)
@@ -128,7 +144,7 @@
    60 : varf vres([du,dv,dp,df,dg],[ut,vt,pt,ft,gt])=
    61 :  int2d(th)( - ( (u0-us0)*dx(u0)+(v0-vs0)*dy(u0))*ut
    62 :             - ( (u0-us0)*dx(v0)+(v0-vs0)*dy(v0))*vt
-   63 :             - nu*(  dx(u0)*dx(ut)+dy(u0)*dy(ut) + dx(v0)*dx(vt)+dy(v0)*dX×y(vt) )
+   63 :             - nu*(  dx(u0)*dx(ut)+dy(u0)*dy(ut) + dx(v0)*dx(vt)+dy(v0)*d{®GázdAØš;5jy(vt) )
    64 :             + (dx(ut)+dy(vt))*p0
    65 :             + (dx(u0)+dy(v0))*pt)
    66 :  - int1d(th,2)( f0*ut + g0*vt )
@@ -157,7 +173,7 @@
    89 :         residub=int1d(th,2)(rf*rf+rg*rg);
    90 :         residu=residuv+residub;
    91 :
-   92 :         cout  << i << " " << sqrt(residuv) << "    " << sqrt(residub) <<X× " " << sqrt(residu) << endl;
+   92 :         cout  << i << " " << sqrt(residuv) << "    " << sqrt(residub) <<{®GázdAØš;5j " " << sqrt(residu) << endl;
    93 :
    94 :         if( sqrt(residu) <= tolNewton ) break;
    95 :
@@ -179,12 +195,12 @@
   111 :         };
   112 :
   113 : {
-  114 :                         ofstream file(pathsteadysol+"Baseflow-"+nummesh+X×"-Re-"+Re+".txt");
+  114 :                         ofstream file(pathsteadysol+"Baseflow-"+nummesh+{®GázdAØš;5j"-Re-"+Re+".txt");
   115 :                         file << u0[];
   116 : };
   117 :
   118 :
-  119 :  sizestack + 1024 =8776  ( 7752 )
+  119 :  sizestack + 1024 =9200  ( 8176 )
  
 -----------------------------------------------------
 -- Steady solution of laminar incompressible flow --
@@ -192,13 +208,41 @@
 -----------------------------------------
 --- Re        =  40
 --- rhos/rhof =  50
---- omegas    =  0.67
+--- omegas    =  0.657
 -----------------------------------------
-  --  mesh:  Nb of Triangles =  31687, Nb of Vertices 15935
+  --  mesh:  Nb of Triangles =  42071, Nb of Vertices 21125
 Construction vecteur
-1 1.09354e-010    2.0498e-030 1.09354e-010
+1 0.00316036    1.29944e-025 0.00316036
 Construction matrice
 Factorisation matrice
  Morse matrix GC Precond diag
  BuildSolverMUMPSseq<double>
+  -- MUMPS LU   n=  189767, peak Mem: 419 Mb sym: 0
+Inversion
+Construction vecteur
+2 0.000343356    4.606e-021 0.000343356
+Construction matrice
+Factorisation matrice
+ Morse matrix GC Precond diag
+ BuildSolverMUMPSseq<double>
+  -- MUMPS LU   n=  189767, peak Mem: 419 Mb sym: 0
+Inversion
+Construction vecteur
+3 1.78274e-005    2.35905e-021 1.78274e-005
+Construction matrice
+Factorisation matrice
+ Morse matrix GC Precond diag
+ BuildSolverMUMPSseq<double>
+  -- MUMPS LU   n=  189767, peak Mem: 419 Mb sym: 0
+Inversion
+Construction vecteur
+4 4.77065e-008    1.69689e-023 4.77065e-008
+Construction matrice
+Factorisation matrice
+ Morse matrix GC Precond diag
+ BuildSolverMUMPSseq<double>
+  -- MUMPS LU   n=  189767, peak Mem: 419 Mb sym: 0
+Inversion
+Construction vecteur
+5 1.38567e-013    3.57643e-026 1.38567e-013
  try getConsole D:\marquet\Desktop\ERC\CODES\WNL\SteadySolution.edp

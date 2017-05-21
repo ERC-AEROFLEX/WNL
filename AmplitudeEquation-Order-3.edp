@@ -1,10 +1,8 @@
 load "MUMPS_seq"
 
-//////////////////
-//  Parametres ///
-//////////////////
 
 real rho=50; 
+real Re=40;
 real Rec=40;
 real omegasc=0.657; 
 real gammas=0.0;
@@ -24,27 +22,11 @@ complex alphat,betat;
 complex eig;
 real lambdac,omegac;
 
-string pathmesh="mesh/";
-string pathbaseflow="baseflow/";
-string pathmode="stabilite/";
-string pathwnl="wnl/";
-
-string namemesh="mesh-"+nummesh+".msh";
-string namebaseflow="Baseflow-"+nummesh+"-Re-"+Rec+".txt";
-string namemode="Dir-Mode-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
-string namemodeadj="Adj-Mode-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
-
-string namewnl3Coeffs="Coeffs-Ordre3-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
+include "Path.edp"
+include "Name.edp"
+include "MeshSpace.edp"
 
 
-string nameeig3="Eigenvalue-Ordre3-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
-
-string nameampli3="Amplitude-Ordre3-Ordre5-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
-
-
-mesh th=readmesh(pathmesh+namemesh);
-
-fespace fuuppp(th,[P1b,P1b,P1,P1,P1]);
 
 complex ysd,vsd;
 int ndoff=fuuppp.ndof;
@@ -52,7 +34,7 @@ int ndoft=ndoff+2;
 complex[int] vect(ndoft);
 
 {
-ifstream filev(pathmode+namemode);
+ifstream filev(patheigenmode+namemodec);
 filev >> eig ;
 filev >> vect(:) ;
 };
