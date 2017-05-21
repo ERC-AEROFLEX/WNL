@@ -1,0 +1,210 @@
+load "MUMPS_seq"
+
+//////////////////
+//  Parametres ///
+//////////////////
+
+real rho=50; 
+real Rec=40;
+real omegasc=0.657; 
+real gammas=0.0;
+int nummesh=22; 
+int mode=1;
+int modeadj=1;
+
+real omegasmin=0.6;
+real domegas=0.01;
+real omegasmax=0.7;
+real omegas=omegasmin;
+
+
+string pathmesh="mesh/";
+string pathbaseflow="baseflow/";
+string pathmode="stabilite/";
+string pathwnl="wnl/";
+
+string namemesh="mesh-"+nummesh+".msh";
+string namebaseflow="Baseflow-"+nummesh+"-Re-"+Rec+".txt";
+string namemode="Dir-Mode-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
+string namemodeadj="Adj-Mode-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
+
+string namewnl3Coeffs="Coeffs-Ordre3-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
+string namewnl5Coeffs="Coeffs-Ordre5-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
+
+
+string nameeig3="Eigenvalue-Ordre3-Ordre5-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
+string nameeig5="Eigenvalue-Ordre5-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
+
+
+string nameampli3="Amplitude-Ordre3-Ordre5-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
+string nameampli5="Amplitude-Ordre5-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
+
+
+complex alpha,alpha1,beta,beta1,beta2,gamma;
+complex alphat,betat;
+complex eig;
+real lambdac,omegac;
+
+{
+ ifstream file(pathmode+namemode);
+ file >> eig ;
+};
+
+lambdac=real(eig); omegac=imag(eig);
+
+
+{
+ifstream file(pathwnl+namewnl3Coeffs);
+file >> alpha ;
+file >> beta ;
+};  
+
+{
+ifstream file(pathwnl+namewnl5Coeffs);
+file >> alpha1 ;
+file >> beta1 ;
+file >> beta2 ;
+file >> gamma ;
+};  
+
+cout << "omegasc= " << omegasc << endl;
+cout << "alpha= " << alpha << endl;
+cout << "beta= " << beta << endl;
+cout << "alpha1= " << alpha1 << endl;
+cout << "beta1= " << beta1 << endl;
+cout << "beta2= " << beta2 << endl;
+cout << "alpha1= " << alpha1 << endl;
+cout << "gamma= " << gamma << endl;
+
+
+//////////////////   Lineaire /////////////////////////
+
+{{
+ofstream file5(pathwnl+nameeig5);
+ofstream file3(pathwnl+nameeig3);
+
+real lambda,omega;
+
+while(omegas<=omegasmax)
+{
+
+ lambda=(omegas*omegas-omegasc*omegasc)*real(alpha);
+ omega=omegac+(omegas*omegas-omegasc*omegasc)*imag(alpha);
+
+ file3 << omegas << " " << lambda << " " << omega << endl;
+
+
+ alphat=alpha+alpha1*(omegas*omegas-omegasc*omegasc);
+ betat=beta+(beta1+beta2)*(omegas*omegas-omegasc*omegasc);
+
+ lambda=(omegas*omegas-omegasc*omegasc)*real(alphat);
+ omega=omegac+(omegas*omegas-omegasc*omegasc)*imag(alphat);
+
+ file5 << omegas << " " << lambda << " " << omega << endl;
+
+
+
+ omegas+=domegas;
+
+};
+
+};};
+
+
+
+real Delta;
+real Xp,Xm,Ap,Am;
+
+//////////////  Non lineaire - Ordre3  //////////////////////
+
+omegas=omegasmin;
+
+
+{
+ofstream file3(pathwnl+nameampli3);
+
+
+while(omegas<=omegasmax)
+{
+
+ Ap=-real(alpha)/real(beta)*(omegas*omegas-omegasc*omegasc); 
+
+ if(Ap>=0)
+ {
+ file3 << omegas << " " << 0. << " " << sqrt(Ap) << " " << 0. << endl;
+ }
+ else
+ {
+ file3 << omegas << " " << 0. << " " << 0. << " " << 0. << endl;
+ };
+ 
+ omegas+=domegas;
+
+};
+
+
+};
+
+
+
+
+//////////////  Non lineaire - Ordre5  //////////////////////
+
+omegas=omegasmin;
+
+{
+ofstream file5(pathwnl+nameampli5);
+
+
+while(omegas<=omegasmax)
+{
+
+alphat=alpha+alpha1*(omegas*omegas-omegasc*omegasc);
+betat=beta+(beta1+beta2)*(omegas*omegas-omegasc*omegasc);
+
+
+Delta=real(betat)*real(betat)-4*real(gamma)*real(alphat)*(omegas*omegas-omegasc*omegasc); 
+
+
+
+if(Delta>=0) 
+{
+ Xp=(-real(betat)+sqrt(Delta))/(2*real(gamma));
+ Xm=(-real(betat)-sqrt(Delta))/(2*real(gamma));
+
+cout << omegas << " " << Delta << " " << Xp << " " << Xm << endl;
+
+
+ if(Xp>=0) Ap=sqrt(Xp); 
+ if(Xm>=0) Am=sqrt(Xm);
+
+
+ if(Xp>=0)
+ {
+  if(Xm>=0)
+  { 
+  file5 << omegas << " " << 0. << " " << Ap << " " << Am << endl;
+  }
+  else
+  {
+  file5 << omegas << " " << 0. << " " << Ap << " " << 0. << endl;
+  };
+ }
+ else
+ {
+ file5 << omegas << " " << 0. << " " << 0. << " " << 0. << endl;
+ };
+
+}
+else
+{
+ file5 << omegas << " " << 0. << " " << 0. << " " << 0. << endl;
+};
+
+
+omegas+=domegas;
+
+};
+
+
+};

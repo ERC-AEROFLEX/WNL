@@ -1,0 +1,394 @@
+load "MUMPS_seq"
+
+//////////////////
+//  Parametres ///
+//////////////////
+
+real Re=40;
+real rho=50; 
+real omegas=0.657; 
+real gammas=0.0;
+int nummesh=22; 
+int mode=1;
+int modeadj=1;
+
+real nu=1./Re;
+
+string pathmesh="mesh/";
+string pathbaseflow="baseflow/";
+string pathmode="stabilite/";
+string pathwnl="wnl/";
+
+string namemesh="mesh-"+nummesh+".msh";
+string namebaseflow="Baseflow-"+nummesh+"-Re-"+Re+".txt";
+string namemode="Dir-Mode-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
+string namemodeadj="Adj-Mode-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
+
+string namewnl2AA="u2-AA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+string namewnl2AAc="u2-AAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+
+
+string namewnl3DeltaA="u3-deltaA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+string namewnl3AAAc="u3-AAAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+string namewnl3AAAcMean="u3-AAAc-Mean-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+string namewnl3AAAcHarmo="u3-AAAc-Harmo-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+string namewnl3AAA="u3-AAA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+string namewnl3Coeffs="Coeffs-Ordre3-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
+
+string namewnl4DeltaAAc="u4-deltaAAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+string namewnl4AAcAAc="u4-AAcAAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+string namewnl4DeltaAA="u4-deltaAA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+string namewnl4AAAAc="u4-AAAAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+string namewnl4AAAA="u4-AAAA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+
+string namewnl5Coeffs="Coeffs-Ordre5-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
+
+
+cout << "-----------------------------------------" << endl;
+cout << "--- Re        =  " << Re << endl;
+cout << "--- rhos/rhof =  " << rho << endl;
+cout << "--- omegas    =  " << omegas << endl;
+cout << "-----------------------------------------" << endl;
+
+mesh th=readmesh(pathmesh+namemesh);
+
+fespace fp(th,P1);
+fespace fu(th,P1b);
+fespace fuuppp(th,[P1b,P1b,P1,P1,P1]);
+
+fuuppp [ur,vr,pr,fr,gr]; 
+
+fuuppp [u0,v0,p0,f0,g0]; real us0=-1; 
+
+fuuppp<complex> [u1,v1,p1,f1,g1]; complex ys1,vs1; 
+fuuppp<complex> [u1c,v1c,p1c,f1c,g1c]; complex ys1c,vs1c; 
+fuuppp<complex> [au1,av1,ap1,af1,ag1]; complex ays1,avs1; 
+
+fuuppp<complex> [u22,v22,p22,f22,g22]; 
+complex ys22,vs22; 
+fuuppp<complex> [u22c,v22c,p22c,f22c,g22c]; 
+complex ys22c,vs22c; 
+fuuppp<complex> [u20,v20,p20,f20,g20]; 
+complex ys20,vs20; 
+
+fuuppp<complex> [u311,v311,p311,f311,g311]; 
+complex ys311,vs311; 
+fuuppp<complex> [u311c,v311c,p311c,f311c,g311c]; 
+complex ys311c,vs311c; 
+fuuppp<complex> [u313,v313,p313,f313,g313]; 
+complex ys313,vs313; 
+fuuppp<complex> [u313c,v313c,p313c,f313c,g313c]; 
+complex ys313c,vs313c; 
+fuuppp<complex> [u33,v33,p33,f33,g33]; 
+complex ys33,vs33; 
+fuuppp<complex> [u33c,v33c,p33c,f33c,g33c]; 
+complex ys33c,vs33c; 
+
+fuuppp<complex> [u402,v402,p402,f402,g402]; 
+complex ys402,vs402; 
+fuuppp<complex> [u404,v404,p404,f404,g404]; 
+complex ys404,vs404; 
+fuuppp<complex> [u422,v422,p422,f422,g422]; 
+complex ys422,vs422; 
+fuuppp<complex> [u424,v424,p424,f424,g424]; 
+complex ys424,vs424; 
+fuuppp<complex> [u44,v44,p44,f44,g44]; 
+complex ys44,vs44; 
+
+
+fuuppp<complex> [u1l,v1l,p1l,f1l,g1l]; complex ys1l,vs1l;
+fuuppp<complex> [u1r,v1r,p1r,f1r,g1r]; complex ys1r,vs1r;
+
+real lambdaA,omegaA;
+
+
+int nff=fuuppp.ndof; int nfs=2; int nft=nff+nfs;
+
+///////////////////////////
+////  Variables ///////////
+///////////////////////////
+
+complex[int] sol(nft),rhs(nft);
+complex[int] solaug(nft+1),rhsaug(nft+1);
+
+real Omega;
+
+///////////////////////////
+/////  Base Flow   ////////
+///////////////////////////
+
+{
+ ifstream file(pathbaseflow+namebaseflow);
+ file >> u0[];
+};
+
+////////////////////////
+/////  Mode A   ////////
+////////////////////////
+
+complex eig;
+
+{
+ ifstream file(pathmode+namemode);
+ file >> eig ;
+ file >> sol ;
+};
+
+lambdaA=real(eig); omegaA=imag(eig);
+u1[]=sol(0:nff-1); ys1=sol(nft-2); vs1=sol(nft-1);
+[u1c,v1c,p1c,f1c,g1c]=[conj(u1),conj(v1),conj(p1),conj(f1),conj(g1)];
+ys1c=conj(ys1);vs1c=conj(vs1);
+
+cout << "eigA= " << eig << endl;
+
+[ur,vr,pr,fr,gr]=[real(u1),real(v1),real(p1),real(f1),real(g1)];
+plot(ur,value=1,wait=1,cmm="u1-r");
+
+///////////////////////////////////////
+///// Ordre2:  Mode AAc - 20   ////////
+///////////////////////////////////////
+
+{
+ifstream file(pathwnl+namewnl2AAc);
+file >> sol ;
+};
+
+u20[]=sol(0:nff-1); ys20=sol(nft-2); vs20=sol(nft-1);
+
+///////////////////////////////////////
+///// Ordre2:  Mode AA - 22    ////////
+///////////////////////////////////////
+
+{
+ifstream file(pathwnl+namewnl2AA);
+file >> sol ;
+};
+
+u22[]=sol(0:nff-1); ys22=sol(nft-2); vs22=sol(nft-1);
+
+[u22c,v22c,p22c,f22c,g22c]=[conj(u22),conj(v22),conj(p22),conj(f22),conj(g22)];
+ys22c=conj(ys22);vs22c=conj(vs22);
+
+
+///////////////////////////////////////
+///// Ordre3:  Mode deltaA  - 311  ////
+///////////////////////////////////////
+
+{
+ifstream file(pathwnl+namewnl3DeltaA);
+file >> solaug ;
+};
+
+u311[]=solaug(0:nff-1); 
+ys311=solaug(nft-2); vs311=solaug(nft-1);
+
+
+[u311c,v311c,p311c,f311c,g311c]=[conj(u311),conj(v311),conj(p311),conj(f311),conj(g311)];
+ys311c=conj(ys311);vs311c=conj(vs311);
+
+
+///////////////////////////////////////
+///// Ordre3:  Mode AAAc  - 313  //////
+///////////////////////////////////////
+
+{
+ifstream file(pathwnl+namewnl3AAAc);
+file >> solaug ;
+};
+
+u313[]=solaug(0:nff-1); 
+ys313=solaug(nft-2); vs313=solaug(nft-1);
+
+
+[u313c,v313c,p313c,f313c,g313c]=[conj(u313),conj(v313),conj(p313),conj(f313),conj(g313)];
+ys313c=conj(ys313);vs313c=conj(vs313);
+
+
+///////////////////////////////////////
+///// Ordre3:  Mode AAA  - 33    //////
+///////////////////////////////////////
+
+{
+ifstream file(pathwnl+namewnl3AAA);
+file >> sol ;
+};
+
+u33[]=sol(0:nff-1); 
+ys33=sol(nft-2); vs33=sol(nft-1);
+
+
+[u33c,v33c,p33c,f33c,g33c]=[conj(u33),conj(v33),conj(p33),conj(f33),conj(g33)];
+ys33c=conj(ys33);vs33c=conj(vs33);
+
+
+/////////////////////////////////////////////
+///// Ordre4:  Mode deltaAAc  - 402    //////
+///////////////////////////////////////
+
+{
+ifstream file(pathwnl+namewnl4DeltaAAc);
+file >> sol ;
+};
+
+u402[]=sol(0:nff-1); 
+ys402=sol(nft-2); vs402=sol(nft-1);
+
+
+/////////////////////////////////////////////
+///// Ordre4:  Mode AAcAAc  - 404    //////
+///////////////////////////////////////
+
+{
+ifstream file(pathwnl+namewnl4AAcAAc);
+file >> sol ;
+};
+
+u404[]=sol(0:nff-1); 
+ys404=sol(nft-2); vs404=sol(nft-1);
+
+////////////////////////////////////////////
+///// Ordre4:  Mode deltaAA  - 422    //////
+///////////////////////////////////////
+
+{
+ifstream file(pathwnl+namewnl4DeltaAA);
+file >> sol ;
+};
+
+u422[]=sol(0:nff-1); 
+ys422=sol(nft-2); vs422=sol(nft-1);
+
+
+////////////////////////////////////////////
+///// Ordre4:  Mode AAAAc  - 424    //////
+///////////////////////////////////////
+
+{
+ifstream file(pathwnl+namewnl4AAAAc);
+file >> sol ;
+};
+
+u424[]=sol(0:nff-1); 
+ys424=sol(nft-2); vs424=sol(nft-1);
+
+////////////////////////////////////////////
+///// Ordre4:  Mode AAAA  - 44    //////
+///////////////////////////////////////
+
+{
+ifstream file(pathwnl+namewnl4AAAA);
+file >> sol ;
+};
+
+u44[]=sol(0:nff-1); 
+ys44=sol(nft-2); vs44=sol(nft-1);
+
+
+////////////////////////////////
+///// Adjoint  Mode A   ///////
+///////////////////////////////
+
+
+{
+ifstream file(pathmode+namemodeadj);
+ file >> eig ;
+ file >> sol ;
+};
+
+au1[]=sol(0:nff-1); ays1=sol(nft-2); avs1=sol(nft-1);
+
+
+cout << "Adj-eigA= " << eig << endl;
+
+complex Normeaf,Normeas,Normea;
+
+Normeaf=int2d(th)(conj(au1)*u1+conj(av1)*v1);
+Normeas=conj(ays1)*ys1+conj(avs1)*vs1;
+
+Normea=Normeaf+Normeas;
+
+au1[]*=1/conj(Normea);
+ays1*=1./conj(Normea);
+avs1*=1./conj(Normea);
+
+Normeaf=int2d(th)(conj(au1)*u1+conj(av1)*v1);
+Normeas=conj(ays1)*ys1+conj(avs1)*vs1;
+
+Normea=Normeaf+Normeas;
+
+cout << "Normeaf= " << Normeaf << endl;
+cout << "Normeas= " << Normeas << endl;
+cout << "Normea= " << Normea << endl;
+
+[ur,vr,pr,fr,gr]=[real(au1),real(av1),real(ap1),real(af1),real(ag1)];
+plot(ur,value=1,wait=1,cmm="Adj-u1-r");
+
+
+complex alpha1=-conj(avs1)*(ys311);
+complex beta1=-conj(avs1)*(ys313);
+
+
+cout << "-------------------------------------" << endl;
+cout << "alpha-1  = " << alpha1 << endl;
+cout << "beta-1   = " << beta1 << endl;
+cout << "-------------------------------------" << endl;
+
+complex beta2,gamma;
+
+beta2=-int2d(th)( 
+conj(au1)*( u22*dx(u311c)+v22*dy(u311c) )
++conj(au1)*( u311c*dx(u22)+v311c*dy(u22) ) 
++conj(au1)*( u20*dx(u311)+v20*dy(u311) )
++conj(au1)*( u311*dx(u20)+v311*dy(u20) ) 
++conj(au1)*( u402*dx(u1)+v402*dy(u1) )
++conj(au1)*( u1*dx(u402)+v1*dy(u402) ) 
++conj(au1)*( u422*dx(u1c)+v422*dy(u1c) )
++conj(au1)*( u1c*dx(u422)+v1c*dy(u422) ) 
++conj(av1)*( u22*dx(v311c)+v22*dy(v311c) )
++conj(av1)*( u311c*dx(v22)+v311c*dy(v22) ) 
++conj(av1)*( u20*dx(v311)+v20*dy(v311) )
++conj(av1)*( u311*dx(v20)+v311*dy(v20) ) 
++conj(av1)*( u402*dx(v1)+v402*dy(v1) )
++conj(av1)*( u1*dx(v402)+v1*dy(v402) ) 
++conj(av1)*( u422*dx(v1c)+v422*dy(v1c) )
++conj(av1)*( u1c*dx(v422)+v1c*dy(v422) ) 
+);
+
+
+gamma=-int2d(th)( 
+conj(au1)*( u22*dx(u313c)+v22*dy(u313c) )
++conj(au1)*( u313c*dx(u22)+v313c*dy(u22) ) 
++conj(au1)*( u20*dx(u313)+v20*dy(u313) )
++conj(au1)*( u313*dx(u20)+v313*dy(u20) ) 
++conj(au1)*( u22c*dx(u33)+v22c*dy(u33) )
++conj(au1)*( u33c*dx(u22c)+v33*dy(u22c) ) 
++conj(au1)*( u404*dx(u1)+v404*dy(u1) )
++conj(au1)*( u1*dx(u404)+v1*dy(u404) ) 
++conj(au1)*( u424*dx(u1c)+v424*dy(u1c) )
++conj(au1)*( u1c*dx(u424)+v1c*dy(u424) ) 
++conj(av1)*( u22*dx(v313c)+v22*dy(v313c) )
++conj(av1)*( u313c*dx(v22)+v313c*dy(v22) ) 
++conj(av1)*( u20*dx(v313)+v20*dy(v313) )
++conj(av1)*( u313*dx(v20)+v313*dy(v20) ) 
++conj(av1)*( u22c*dx(v33)+v22c*dy(v33) )
++conj(av1)*( u33c*dx(v22c)+v33*dy(v22c) ) 
++conj(av1)*( u404*dx(v1)+v404*dy(v1) )
++conj(av1)*( u1*dx(v404)+v1*dy(v404) ) 
++conj(av1)*( u424*dx(v1c)+v424*dy(v1c) )
++conj(av1)*( u1c*dx(v424)+v1c*dy(v424) ) 
+);
+
+cout << "-------------------------------------" << endl;
+cout << "beta-2  = " << beta2 << endl;
+cout << "gamma   = " << gamma << endl;
+cout << "-------------------------------------" << endl;
+
+{
+ofstream file(pathwnl+namewnl5Coeffs);
+file << alpha1 << endl;
+file << beta1 << endl;
+file << beta2 << endl;
+file << gamma << endl;
+};  
+
+

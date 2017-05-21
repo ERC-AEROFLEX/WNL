@@ -1,0 +1,122 @@
+// Conditions aux limites sur le cylindres prises en compte de facon faible	
+// Version chere sans reduction de espace des forces
+load "MUMPS_seq"
+
+// Nombre de Reynolds
+real Re=46.7;
+real Rep=46;
+int nummesh=22;
+int nummeshp=22;
+real nu=1./Re;
+real tolNewton=1.e-12;
+
+mesh th=readmesh("../mesh/mesh-"+nummesh+".msh");
+			
+fespace fuuppp(th,[P1b,P1b,P1,P1,P1]);
+		
+fuuppp [u0,v0,p0,f0,g0];
+real us0,vs0;
+us0=-1.; vs0=0.0;
+
+if(nummesh!=nummeshp)
+{
+
+	mesh thp=readmesh("../mesh/mesh-"+nummeshp+".msh");
+			
+	fespace fuupppr(thp,[P1b,P1b,P1,P1,P1]);
+		
+	fuupppr [u0r,v0r,p0r,f0r,g0r];
+
+	{
+	ifstream file("./Baseflow-"+nummeshp+"-Re-"+Rep+".txt");
+	file >> u0r[];
+	};
+
+	[u0,v0,p0,f0,g0]=[u0r,v0r,p0r,f0r,g0r];
+}
+else
+{
+	if(Re==1)
+	{
+		[u0,v0,p0,f0,g0]=[1,0,0,0,0];
+	}
+	else
+	{
+	{
+	ifstream file("./Baseflow-"+nummesh+"-Re-"+Rep+".txt");
+	file >> u0[];
+	};
+	};
+};
+
+
+varf vmat([du,dv,dp,df,dg],[ut,vt,pt,ft,gt])=
+ int2d(th)( ( du*dx(u0)+dv*dy(u0) + (u0-us0)*dx(du)+(v0-vs0)*dy(du) )*ut
+          + ( du*dx(v0)+dv*dy(v0) + (u0-us0)*dx(dv)+(v0-vs0)*dy(dv) )*vt
+          + nu*(dx(du)*dx(ut)+dy(du)*dy(ut)+dx(dv)*dx(vt)+dy(dv)*dy(vt))
+          - (dx(ut)+dy(vt))*dp
+          - (dx(du)+dy(dv))*pt +(dp*pt+df*ft+dg*gt)*1.e-16)
+        + int1d(th,2)(df*ut + dg*vt)
+        + int1d(th,2)(du*ft + dv*gt)
+        +on(1,du=1.,dv=1.)+on(4,dv=1.);
+	
+
+varf vres([du,dv,dp,df,dg],[ut,vt,pt,ft,gt])=
+ int2d(th)( - ( (u0-us0)*dx(u0)+(v0-vs0)*dy(u0))*ut
+            - ( (u0-us0)*dx(v0)+(v0-vs0)*dy(v0))*vt
+            - nu*(  dx(u0)*dx(ut)+dy(u0)*dy(ut) + dx(v0)*dx(vt)+dy(v0)*dy(vt) )
+	    + (dx(ut)+dy(vt))*p0
+	    + (dx(u0)+dy(v0))*pt)
+ - int1d(th,2)( f0*ut + g0*vt )
+ - int1d(th,2)( (u0-us0)*ft + (v0-vs0)*gt )
+ +on(1,du=0.-u0,dv=0.-v0)+on(4,dv=0.-v0);
+
+
+
+matrix A;
+fuuppp [du,dv,dp,df,dg];
+fuuppp [ru,rv,rp,rf,rg];
+
+real residu,residuv,residub;
+int i=0;
+residu=1.;
+
+
+while(sqrt(residu)>1.e-12)
+{
+
+	i+=1;
+
+	cout << "Construction vecteur" << endl;
+        ru[]=vres(0,fuuppp,tgv=1);
+	residuv=int2d(th)(ru*ru+rv*rv+rp*rp);
+	residub=int1d(th,2)(rf*rf+rg*rg);
+	residu=residuv+residub;
+
+	cout  << i << " " << sqrt(residuv) << "    " << sqrt(residub) << " " << sqrt(residu) << endl;
+
+	if( sqrt(residu) <= tolNewton ) break;
+
+	cout << "Construction matrice" << endl;
+	A=vmat(fuuppp,fuuppp,tgv=-1);
+			
+	cout << "Factorisation matrice" << endl;
+	verbosity=10;
+	set(A,solver=sparsesolver);
+	verbosity=0;
+
+
+	cout << "Inversion" << endl;
+	du[]=A^-1*ru[];
+			
+	u0[]+=du[];
+	plot(u0,value=1,wait=1,cmm="iter="+i);
+	
+	};
+
+{
+			ofstream file("./Baseflow-"+nummesh+"-Re-"+Re+".txt");
+			file << u0[];
+};
+	
+

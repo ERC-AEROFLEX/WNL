@@ -1,0 +1,138 @@
+load "MUMPS_seq"
+
+//////////////////
+//  Parametres ///
+//////////////////
+
+real rho=50; 
+real Rec=40;
+real omegasc=0.657; 
+real gammas=0.0;
+int nummesh=22; 
+
+real omegasmin=0.5;
+real domegas=0.001;
+real omegasmax=0.8;
+real omegas=omegasmin;
+
+
+int mode=1;
+int modeadj=1;
+
+complex alpha,alpha1,beta,beta1,beta2,gamma;
+complex alphat,betat;
+complex eig;
+real lambdac,omegac;
+
+string pathmesh="mesh/";
+string pathbaseflow="baseflow/";
+string pathmode="stabilite/";
+string pathwnl="wnl/";
+
+string namemesh="mesh-"+nummesh+".msh";
+string namebaseflow="Baseflow-"+nummesh+"-Re-"+Rec+".txt";
+string namemode="Dir-Mode-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
+string namemodeadj="Adj-Mode-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
+
+string namewnl3Coeffs="Coeffs-Ordre3-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
+
+
+string nameeig3="Eigenvalue-Ordre3-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
+
+string nameampli3="Amplitude-Ordre3-Ordre5-Re-"+Rec+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegasc+"-mesh-"+nummesh+"-num-"+mode+".dat";
+
+
+mesh th=readmesh(pathmesh+namemesh);
+
+fespace fuuppp(th,[P1b,P1b,P1,P1,P1]);
+
+complex ysd,vsd;
+int ndoff=fuuppp.ndof;
+int ndoft=ndoff+2;
+complex[int] vect(ndoft);
+
+{
+ifstream filev(pathmode+namemode);
+filev >> eig ;
+filev >> vect(:) ;
+};
+
+lambdac=real(eig); omegac=imag(eig);
+ysd=vect(ndoff);
+
+
+{
+ifstream file(pathwnl+namewnl3Coeffs);
+file >> alpha ;
+file >> beta ;
+};  
+
+
+cout << "ksc      = " << omegasc << endl;
+cout << "omegac   = " << omegac << endl;
+cout << "alpha    = " << alpha << endl;
+cout << "beta     = " << beta << endl;
+cout << "abs(ysd) = " << abs(ysd) << endl;
+
+
+//////////////////   Lineaire /////////////////////////
+
+{
+ofstream file3(pathwnl+nameeig3);
+
+
+real lambda,omega;
+
+while(omegas<=omegasmax)
+{
+
+ lambda=(omegas*omegas-omegasc*omegasc)*real(alpha);
+ omega=omegac+(omegas*omegas-omegasc*omegasc)*imag(alpha);
+
+ file3 << omegas << " " << lambda << " " << omega << endl;
+
+ omegas+=domegas;
+
+};
+
+};
+
+
+
+real Delta;
+real Xp,Xm,Ap,Am;
+
+//////////////  Non lineaire - Ordre3  //////////////////////
+
+real omegal,omeganl,ysmax;
+
+omegas=omegasmin;
+
+
+{
+ofstream file3(pathwnl+nameampli3);
+
+
+while(omegas<=omegasmax)
+{
+
+ Ap=real(alpha)/real(beta)*(omegas*omegas-omegasc*omegasc); 
+ 
+ if(Ap>=0)
+ {
+ omegal=omegac+(omegas*omegas-omegasc*omegasc)*imag(alpha);
+ omeganl=omegal-imag(beta)*Ap;
+ ysmax=2*sqrt(Ap)*abs(ysd);
+
+ file3 << omegas << " " << sqrt(Ap) << " " << -sqrt(Ap) << " " << omeganl << endl;
+ 
+ 
+ };
+ 
+ omegas+=domegas;
+
+};
+
+
+};
+

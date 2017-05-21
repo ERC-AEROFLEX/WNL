@@ -1,0 +1,55 @@
+int nummesh=22;
+
+real Lo=30;
+real Li=20;
+real Lh=20;
+
+real Lh1=1;
+
+border bodyr(t=0,pi) { x = 1./2.*cos(t); y= 1./2*sin(t); label=2;}
+
+border bodyl(t=pi,2*pi) { x = 1./2.*cos(t); y= 1./2*sin(t); label=2;}
+
+
+border right1(t=-Lh,-Lh1){ x = Lo; y= t; label=3;}
+border right2(t=-Lh1,Lh1){ x = Lo; y= t; label=3;}
+border right3(t=Lh1,Lh){ x = Lo; y= t; label=3;}
+
+border top(t=Lo,-Li) { x = t; y= Lh; label=4;}
+
+border left1(t=Lh,Lh1) { x = -Li; y= t; label=1;}
+border left2(t=Lh1,-Lh1) { x = -Li; y= t; label=1;}
+border left3(t=-Lh1,-Lh) { x = -Li; y= t; label=1;}
+
+border down(t=-Li,Lo) { x = t; y= -Lh; label=4;}
+
+border insidetop0(t=-Li,-1) { x = t; y= Lh1; label=5;}
+border insidetop1(t=-1,Lo/4) { x = t; y= Lh1; label=5;}
+border insidetop2(t=Lo/4,Lo/2) { x = t; y= Lh1; label=5;}
+border insidetop3(t=Lo/2,Lo) { x = t; y= Lh1; label=5;}
+
+border insidedown0(t=-Li,-1) { x = t; y= -Lh1; label=5;}
+border insidedown1(t=-1,Lo/4) { x = t; y= -Lh1; label=5;}
+border insidedown2(t=Lo/4,Lo/2) { x = t; y= -Lh1; label=5;}
+border insidedown3(t=Lo/2,Lo) { x = t; y= -Lh1; label=5;}
+
+border insidemiddle1(t=0.5,Lo/4) { x = t; y= 0; label=5;}
+border insidemiddle2(t=-1,-0.5) { x = t; y= 0; label=5;}
+
+
+// densite de points
+int nf=20;
+int nm1=15;
+int nm2=10;
+int nm3=5;  
+int nc=1;  
+
+mesh th = buildmesh( right1((Lh-Lh1)*nc)+ right2(2*Lh1*nm3)+ right3((Lh-Lh1)*nc) 
++ top((Lo+Li)*nc*0.5)+left1((Lh-Lh1)*nc*0.5)+left2(2*Lh1*nm3*0.5)+left3((Lh-Lh1)*nc*0.5)+down((Lo+Li)*nc*0.5) + bodyl(-pi*nf*0.5)+ bodyr(-pi*nf*0.5) 
++ insidetop0((Li-1)*nm3)+ insidetop1((Lo/4+1)*nm1)+insidetop2(Lo/4*nm2)+insidetop3(Lo/2*nm3) 
++ insidedown0((Li-1)*nm3)+ insidedown1((Lo/4+1)*nm1) + insidedown2(Lo/4*nm2)+ insidedown3(Lo/2*nm3)
++ insidemiddle1((Lo/4-0.5)*nf)+ insidemiddle2(0.5*nf) ) ;
+
+plot(th,wait=1);
+cout << th.nt << " " << th.nv << endl;
+savemesh(th,"mesh-"+nummesh+".msh");

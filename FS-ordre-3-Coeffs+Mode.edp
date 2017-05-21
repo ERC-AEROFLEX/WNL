@@ -1,0 +1,541 @@
+load "MUMPS_seq"
+
+//////////////////
+//  Parametres ///
+//////////////////
+
+real Re=40;
+real rho=50; 
+real omegas=0.657; 
+real gammas=0.0;
+int nummesh=22; 
+int mode=1;
+int modeadj=1;
+
+real nu=1./Re;
+
+string pathmesh="mesh/";
+string pathbaseflow="baseflow/";
+string pathmode="stabilite/";
+string pathwnl="wnl/";
+
+string namemesh="mesh-"+nummesh+".msh";
+string namebaseflow="Baseflow-"+nummesh+"-Re-"+Re+".txt";
+string namemode="Dir-Mode-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
+string namemodeadj="Adj-Mode-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
+
+string namewnl2AA="u2-AA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+string namewnl2AAc="u2-AAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+
+
+string namewnl3DeltaA="u3-deltaA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+string namewnl3AAAc="u3-AAAc-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+string namewnl3AAAcMean="u3-AAAc-Mean-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+string namewnl3AAAcHarmo="u3-AAAc-Harmo-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+string namewnl3AAA="u3-AAA-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".txt";
+string namewnl3Coeffs="Coeffs-Ordre3-Re-"+Re+"-rho-"+rho+"-gammas-"+gammas+"-omegas-"+omegas+"-mesh-"+nummesh+"-num-"+mode+".dat";
+
+cout << "-----------------------------------------" << endl;
+cout << "--- Re        =  " << Re << endl;
+cout << "--- rhos/rhof =  " << rho << endl;
+cout << "--- omegas    =  " << omegas << endl;
+cout << "-----------------------------------------" << endl;
+
+mesh th=readmesh(pathmesh+namemesh);
+
+fespace fp(th,P1);
+fespace fu(th,P1b);
+fespace fuuppp(th,[P1b,P1b,P1,P1,P1]);
+
+fuuppp [ur,vr,pr,fr,gr]; complex ys1,vs1;
+
+fuuppp [u0,v0,p0,f0,g0]; real us0=-1; 
+
+
+fuuppp<complex> [u1A,v1A,p1A,f1A,g1A]; complex ys1A,vs1A; 
+fuuppp<complex> [u1Ac,v1Ac,p1Ac,f1Ac,g1Ac]; complex ys1Ac,vs1Ac; 
+
+
+fuuppp<complex> [au1A,av1A,ap1A,af1A,ag1A]; complex ays1A,avs1A; 
+fuuppp<complex> [au1Ac,av1Ac,ap1Ac,af1Ac,ag1Ac]; 
+complex ays1Ac,avs1Ac; 
+
+fuuppp<complex> [u2AAc,v2AAc,p2AAc,f2AAc,g2AAc]; 
+complex ys2AAc,vs2AAc; 
+fuuppp<complex> [u2AA,v2AA,p2AA,f2AA,g2AA]; 
+complex ys2AA,vs2AA; 
+
+fuuppp<complex> [u313,v313,p313,f313,g313]; 
+complex ys313,vs313; 
+
+fuuppp<complex> [u311,v311,p311,f311,g311]; 
+complex ys311,vs311; 
+
+fuuppp<complex> [u33,v33,p33,f33,g33]; 
+complex ys33,vs33; 
+
+real lambdaA,omegaA;
+
+int nff=fuuppp.ndof; int nfs=2; int nft=nff+nfs;
+
+///////////////////////////
+////  Variables ///////////
+///////////////////////////
+
+matrix<complex> A;
+
+complex[int] sol(nft),rhs(nft);
+
+///////////////////////////
+/////  Base Flow   ////////
+///////////////////////////
+
+{
+ ifstream file(pathbaseflow+namebaseflow);
+ file >> u0[];
+};
+
+////////////////////////
+/////  Mode A   ////////
+////////////////////////
+
+complex eig;
+
+{
+ ifstream file(pathmode+namemode);
+ file >> eig ;
+ file >> sol ;
+};
+
+lambdaA=real(eig); omegaA=imag(eig);
+u1A[]=sol(0:nff-1); ys1A=sol(nft-2); vs1A=sol(nft-1);
+[u1Ac,v1Ac,p1Ac,f1Ac,g1Ac]=[conj(u1A),conj(v1A),conj(p1A),conj(f1A),conj(g1A)];
+ys1Ac=conj(sol(nft-2)); vs1Ac=conj(sol(nft-1));
+
+cout << "eigA= " << eig << endl;
+
+[ur,vr,pr,fr,gr]=[real(u1A),real(v1A),real(p1A),real(f1A),real(g1A)];
+plot(ur,value=1,wait=1,cmm="u1A-r");
+
+
+////////////////////////////////
+///// Adjoint  Mode A   ///////
+///////////////////////////////
+
+
+{
+ ifstream file(pathmode+namemodeadj);
+ file >> eig ;
+ file >> sol ;
+};
+
+au1A[]=sol(0:nff-1); ays1A=sol(nft-2); avs1A=sol(nft-1);
+
+
+cout << "Adj-eigA= " << eig << endl;
+
+complex Normeaf,Normeas,Normea;
+
+Normeaf=int2d(th)(conj(au1A)*u1A+conj(av1A)*v1A);
+Normeas=conj(ays1A)*ys1A+conj(avs1A)*vs1A;
+
+Normea=Normeaf+Normeas;
+
+au1A[]*=1/conj(Normea);
+ays1A*=1./conj(Normea);
+avs1A*=1./conj(Normea);
+
+Normeaf=int2d(th)(conj(au1A)*u1A+conj(av1A)*v1A);
+Normeas=conj(ays1A)*ys1A+conj(avs1A)*vs1A;
+
+Normea=Normeaf+Normeas;
+
+cout << "Normeaf= " << Normeaf << endl;
+cout << "Normeas= " << Normeas << endl;
+cout << "Normea= " << Normea << endl;
+
+[ur,vr,pr,fr,gr]=[real(au1A),real(av1A),real(ap1A),real(af1A),real(ag1A)];
+plot(ur,value=1,wait=1,cmm="Adj-u1A-r");
+
+
+/////////////////////
+/////  Mode AA  /////
+/////////////////////
+
+
+{
+ifstream file(pathwnl+namewnl2AA);
+file >> sol ;
+};
+
+u2AA[]=sol(0:nff-1); ys2AA=sol(nft-2); vs2AA=sol(nft-1);
+
+[ur,vr,pr,fr,gr]=[real(u2AA),real(v2AA),real(p2AA),real(f2AA),real(g2AA)];
+plot(ur,value=1,wait=1,cmm="u2AA-r");
+
+
+//////////////////////
+/////  Mode AAc  /////
+//////////////////////
+
+{
+ifstream file(pathwnl+namewnl2AAc);
+file >> sol ;
+};
+
+u2AAc[]=sol(0:nff-1); ys2AAc=sol(nft-2); vs2AAc=sol(nft-1);
+
+[ur,vr,pr,fr,gr]=[real(u2AAc),real(v2AAc),real(p2AAc),real(f2AAc),real(g2AAc)];
+plot(ur,value=1,wait=1,cmm="u2AAc-r");
+
+
+
+///////////////////////////////////////////////
+////   Formulation variationnelle  ////////////
+///////////////////////////////////////////////
+
+cout << "Construction matrice - u31 " << endl;
+
+{
+
+ matrix<complex> Aff ; complex[int,int] Ass(nfs,nfs);
+ fuuppp<complex> [fsu0,fsv0,fsp0,fsf0,fsg0];
+ fuuppp<complex> [fsu1,fsv1,fsp1,fsf1,fsg1];
+ fuuppp<complex> [fsu2,fsv2,fsp2,fsf2,fsg2];
+ fuuppp<complex> [rsu0,rsv0,rsp0,rsf0,rsg0];
+ fuuppp<complex> [rsu1,rsv1,rsp1,rsf1,rsg1];
+ fuuppp<complex> [rsu2,rsv2,rsp2,rsf2,rsg2];
+
+ varf vAff([u,v,p,f,g],[ut,vt,pt,ft,gt]) =
+ int2d(th)(
+   omegaA*1i*(u*ut+v*vt)
+ +( (u0-us0)*dx(u)+v0*dy(u) + u*dx(u0)+v*dy(u0) )*ut
+ +( (u0-us0)*dx(v)+v0*dy(v) + u*dx(v0)+v*dy(v0) )*vt
+ + nu*(dx(u)*dx(ut)+dy(u)*dy(ut))
+ + nu*(dx(v)*dx(vt)+dy(v)*dy(vt))
+ - (dx(ut)+dy(vt))*p
+ - (dx(u)+dy(v))*pt + 1.e-16*(p*pt+f*ft+g*gt))
+ +int1d(th,2)(f*ut+g*vt)
+ +int1d(th,2)(u*ft+v*gt)
+ +on(4,v=1)+on(1,u=1.,v=1.);
+
+ Aff = vAff(fuuppp,fuuppp,tgv=-1);
+ 
+ // Matrix Fluid/Solid
+
+ varf vvs([u,v,p,f,g],[ut,vt,pt,ft,gt]) = 
+ int2d(th)( - dy(u0)*ut - dy(v0)*vt ) 
+-int1d(th,2)(gt)+ on(4,v=0.)+on(1,u=0.,v=0.);
+
+ fsu0[]=0.; fsu1[]=vvs(0,fuuppp,tgv=1);
+
+// Matrix Solid/Fluid
+varf vfy([u,v,p,f,g],[ut,vt,pt,ft,gt]) = int1d(th,2)( -(4./pi/rho)*gt );
+
+ rsu0[]=0.; rsu1[]=vfy(0,fuuppp);
+
+ /// Matrix Solid/Solid
+
+ 
+ Ass(0,0)=omegaA*1i; Ass(0,1)=-1; 
+ Ass(1,1)=omegaA*1i; Ass(1,0)=omegas*omegas; 
+
+
+// Added terms
+
+ varf vd([u,v,p,f,g],[ut,vt,pt,ft,gt]) = 
+ int2d(th)( u1A*ut +v1A*vt );
+
+ varf va([u,v,p,f,g],[ut,vt,pt,ft,gt]) = 
+ int2d(th)( au1A*ut + av1A*vt );
+
+ fsu2[]=vd(0,fuuppp); 
+ rsu2[]=va(0,fuuppp);
+
+cout << "Assemblage matrice" << endl;
+
+ A = [
+  [Aff     ,  fsu0[]    , fsu1[]      , fsu2[] ] ,
+  [rsu0[]' ,  Ass(0,0)  , Ass(0,1)    , ys1A  ] ,
+  [rsu1[]' ,  Ass(1,0)  , Ass(1,1)    , vs1A  ] ,
+  [rsu2[]' ,conj(ays1A) , conj(avs1A) , 1.e-10  ] 
+  ];
+
+cout << "Fin Construction matrice" << endl;
+
+};
+
+cout << "Factorisation matrice " << endl;
+set(A,solver=sparsesolver);
+
+complex[int] solaug(nft+1),rhsaug(nft+1);
+
+
+cout << "Construction vecteur - Coeff Lineaire " << endl;
+
+rhsaug=0.; 
+rhsaug(nft-1)=-ys1A;
+
+cout << "Resolution " << endl;
+solaug=A^-1*rhsaug; 
+
+complex alpha=solaug(nft);
+
+cout << "alpha= " << alpha << endl;
+
+u311[]=solaug(0:nft-1);
+cout << " ys= " << solaug(nft-2) << endl;
+cout << " vs= " << solaug(nft-1) << endl;
+cout << " Fy= " << int1d(th,2)(g311) << endl;
+[ur,vr,pr,fr,gr]=[real(u311),real(v311),real(p311),real(f311),real(g311)];
+plot(ur,value=1,wait=1,cmm="Mode3-deltaA");
+
+
+{
+ofstream file(pathwnl+namewnl3DeltaA);
+file << solaug << endl;
+};
+
+
+cout << "Construction vecteur - Coeff Mean Flow " << endl;
+
+{
+ varf vrhs([u,v,p,f,g],[ut,vt,pt,ft,gt]) =
+ int2d(th)(-( u1A*dx(u2AAc) + (v1A-vs1A)*dy(u2AAc) )*ut
+           -( u1A*dx(v2AAc) + (v1A-vs1A)*dy(v2AAc) )*vt
+           -( u2AAc*dx(u1A) + (v2AAc-vs2AAc)*dy(u1A) )*ut
+           -( u2AAc*dx(v1A) + (v2AAc-vs2AAc)*dy(v1A) )*vt
+           )+on(4,v=0.)+on(1,u=0.,v=0.);
+
+
+fuuppp<complex> [ru,rv,rp,rf,rg];
+rhsaug=0.0; 
+ru[]=vrhs(0,fuuppp,tgv=1);
+rhsaug(0:nft-3)=ru[];
+};
+
+cout << "Fin Construction vecteur " << endl;
+
+
+cout << "Resolution " << endl;
+solaug=A^-1*rhsaug; 
+
+complex betamean=-solaug(nft);
+cout << "beta-mean= " << betamean << endl;
+
+
+{
+ofstream file(pathwnl+namewnl3AAAc);
+file << solaug << endl;
+};
+
+
+cout << "Construction vecteur - Coeff Harmonic " << endl;
+
+{
+  varf vrhs([u,v,p,f,g],[ut,vt,pt,ft,gt]) =
+ int2d(th)(-( u1Ac*dx(u2AA) + (v1Ac-vs1Ac)*dy(u2AA) )*ut
+           -( u1Ac*dx(v2AA) + (v1Ac-vs1Ac)*dy(v2AA) )*vt
+           -( u2AA*dx(u1Ac) + (v2AA-vs2AA)*dy(u1Ac) )*ut
+           -( u2AA*dx(v1Ac) + (v2AA-vs2AA)*dy(v1Ac) )*vt
+		 )+on(4,v=0.)+on(1,u=0.,v=0.);
+
+fuuppp<complex> [ru,rv,rp,rf,rg];
+rhsaug=0.0; 
+ru[]=vrhs(0,fuuppp,tgv=1);
+rhsaug(0:nft-3)=ru[];
+};
+
+cout << "Fin Construction vecteur " << endl;
+
+
+cout << "Resolution " << endl;
+solaug=A^-1*rhsaug; 
+
+complex betaharmo=-solaug(nft);
+cout << "beta-harmo= " << betaharmo << endl;
+
+cout << "beta-mean+harmo = " << betamean+betaharmo << endl;
+
+
+{
+ofstream file(pathwnl+namewnl3AAAcHarmo);
+file << solaug << endl;
+};
+
+
+
+
+cout << "Construction vecteur - Coeff Total " << endl;
+
+{
+ varf vrhs([u,v,p,f,g],[ut,vt,pt,ft,gt]) =
+ int2d(th)(-( u1A*dx(u2AAc) + (v1A-vs1A)*dy(u2AAc) )*ut
+           -( u1A*dx(v2AAc) + (v1A-vs1A)*dy(v2AAc) )*vt
+           -( u2AAc*dx(u1A) + (v2AAc-vs2AAc)*dy(u1A) )*ut
+           -( u2AAc*dx(v1A) + (v2AAc-vs2AAc)*dy(v1A) )*vt
+           -( u1Ac*dx(u2AA) + (v1Ac-vs1Ac)*dy(u2AA) )*ut
+           -( u1Ac*dx(v2AA) + (v1Ac-vs1Ac)*dy(v2AA) )*vt
+           -( u2AA*dx(u1Ac) + (v2AA-vs2AA)*dy(u1Ac) )*ut
+           -( u2AA*dx(v1Ac) + (v2AA-vs2AA)*dy(v1Ac) )*vt
+		 )+on(4,v=0.)+on(1,u=0.,v=0.);
+
+
+fuuppp<complex> [ru,rv,rp,rf,rg];
+rhsaug=0.0; 
+ru[]=vrhs(0,fuuppp,tgv=1);
+rhsaug(0:nft-3)=ru[];
+};
+
+cout << "Fin Construction vecteur " << endl;
+
+cout << "Resolution " << endl;
+solaug=A^-1*rhsaug; 
+
+complex beta=-solaug(nft);
+cout << "beta= " << beta << endl;
+
+u313[]=solaug(0:nft-1);
+cout << " ys= " << solaug(nft-2) << endl;
+cout << " vs= " << solaug(nft-1) << endl;
+cout << " Fy= " << int1d(th,2)(g313) << endl;
+[ur,vr,pr,fr,gr]=[real(u313),real(v313),real(p313),real(f313),real(g313)];
+plot(ur,value=1,wait=1,cmm="Mode3-AAAc");
+
+
+{
+ofstream file(pathwnl+namewnl3AAAc);
+file << solaug << endl;
+};
+
+
+
+
+cout << "--------------------------------" << endl;
+cout << "--------------------------------" << endl;
+cout << "Construction matrice - u33 " << endl;
+
+{
+
+ matrix<complex> Aff ; complex[int,int] Ass(nfs,nfs);
+ fuuppp<complex> [fsu0,fsv0,fsp0,fsf0,fsg0];
+ fuuppp<complex> [fsu1,fsv1,fsp1,fsf1,fsg1];
+ fuuppp<complex> [fsu2,fsv2,fsp2,fsf2,fsg2];
+ fuuppp<complex> [rsu0,rsv0,rsp0,rsf0,rsg0];
+ fuuppp<complex> [rsu1,rsv1,rsp1,rsf1,rsg1];
+ fuuppp<complex> [rsu2,rsv2,rsp2,rsf2,rsg2];
+
+ varf vAff([u,v,p,f,g],[ut,vt,pt,ft,gt]) =
+ int2d(th)(
+   3*omegaA*1i*(u*ut+v*vt)
+ +( (u0-us0)*dx(u)+v0*dy(u) + u*dx(u0)+v*dy(u0) )*ut
+ +( (u0-us0)*dx(v)+v0*dy(v) + u*dx(v0)+v*dy(v0) )*vt
+ + nu*(dx(u)*dx(ut)+dy(u)*dy(ut))
+ + nu*(dx(v)*dx(vt)+dy(v)*dy(vt))
+ - (dx(ut)+dy(vt))*p
+ - (dx(u)+dy(v))*pt + 1.e-16*(p*pt+f*ft+g*gt))
+ +int1d(th,2)(f*ut+g*vt)
+ +int1d(th,2)(u*ft+v*gt)
+ +on(4,v=1)+on(1,u=1.,v=1.);
+
+ Aff = vAff(fuuppp,fuuppp,tgv=-1);
+ 
+ // Matrix Fluid/Solid
+
+ varf vvs([u,v,p,f,g],[ut,vt,pt,ft,gt]) = 
+ int2d(th)( - dy(u0)*ut - dy(v0)*vt ) 
+-int1d(th,2)(gt)+ on(4,v=0.)+on(1,u=0.,v=0.);
+
+ fsu0[]=0.; fsu1[]=vvs(0,fuuppp,tgv=1);
+
+// Matrix Solid/Fluid
+varf vfy([u,v,p,f,g],[ut,vt,pt,ft,gt]) = int1d(th,2)( -(4./pi/rho)*gt );
+
+ rsu0[]=0.; rsu1[]=vfy(0,fuuppp);
+
+ /// Matrix Solid/Solid
+
+ 
+ Ass(0,0)=omegaA*1i; Ass(0,1)=-1; 
+ Ass(1,1)=omegaA*1i; Ass(1,0)=omegas*omegas; 
+
+
+// Added terms
+
+ varf vd([u,v,p,f,g],[ut,vt,pt,ft,gt]) = 
+ int2d(th)( u1A*ut +v1A*vt );
+
+ varf va([u,v,p,f,g],[ut,vt,pt,ft,gt]) = 
+ int2d(th)( au1A*ut + av1A*vt );
+
+ fsu2[]=vd(0,fuuppp); 
+ rsu2[]=va(0,fuuppp);
+
+cout << "Assemblage matrice" << endl;
+
+ A = [
+  [Aff     ,  fsu0[]    , fsu1[]      ] ,
+  [rsu0[]' ,  Ass(0,0)  , Ass(0,1)    ] ,
+  [rsu1[]' ,  Ass(1,0)  , Ass(1,1)    ] 
+  ];
+
+cout << "Fin Construction matrice" << endl;
+
+};
+
+cout << "Factorisation matrice " << endl;
+set(A,solver=sparsesolver);
+
+
+cout << "Construction vecteur - A^3 " << endl;
+
+{
+ varf vrhs([u,v,p,f,g],[ut,vt,pt,ft,gt]) =
+ int2d(th)(-( u2AA*dx(u1A) + (v2AA-vs2AA)*dy(u1A) )*ut
+           -( u2AA*dx(v1A) + (v2AA-vs2AA)*dy(v1A) )*vt
+           -( u1A*dx(u2AA) + (v1A-vs1A)*dy(u2AA) )*ut
+           -( u1A*dx(v2AA) + (v1A-vs1A)*dy(v2AA) )*vt
+            )+on(4,v=0.)+on(1,u=0.,v=0.);
+
+fuuppp<complex> [ru,rv,rp,rf,rg];
+ru[]=vrhs(0,fuuppp,tgv=1);
+rhs=0.0; 
+rhs(0:nft-2)=ru[];
+};
+
+cout << "Fin Construction vecteur " << endl;
+
+
+cout << "Resolution " << endl;
+sol=A^-1*rhs; 
+
+
+u33[]=sol(0:nft-1);
+cout << " ys= " << sol(nft-2) << endl;
+cout << " vs= " << sol(nft-1) << endl;
+cout << " Fy= " << int1d(th,2)(g33) << endl;
+[ur,vr,pr,fr,gr]=[real(u33),real(v33),real(p33),real(f33),real(g33)];
+plot(ur,value=1,wait=1,cmm="Mode3-AAA");
+
+
+{
+ofstream file(pathwnl+namewnl3AAA);
+file << sol << endl;
+};
+
+
+{
+ofstream file(pathwnl+namewnl3Coeffs);
+file << alpha << endl;
+file << beta << endl;
+};  
+
+
+
+
+
+
+
+
+
+

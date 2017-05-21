@@ -1,0 +1,53 @@
+//Parametres adimensiones physiques
+
+real Re=40; // Nombre de Reynolds
+int nummesh=2; // Maillage
+
+///////////////////////////////////////////////////////////
+
+mesh th=readmesh("../mesh/mesh-"+nummesh+".msh");
+
+fespace fuuppp(th,[P1b,P1b,P1,P1,P1]);
+
+fuuppp [u,v,p,f,g];  
+
+{
+ifstream filev("./Baseflow-"+nummesh+"-Re-"+Re+".txt");
+filev >> u[];
+};
+
+///////////////////////////////////////////////
+////   Ecriture au format tecplot    //////////
+///////////////////////////////////////////////
+
+plot(u,value=1,wait=0,cmm="BaseFlow");
+
+
+{
+
+ofstream file("./Baseflow-"+nummesh+"-Re-"+Re+".dat");
+file << "VARIABLES = \"X\" ,  \"Y\" , \"u\" , \"v\" " << endl;
+
+real nbt=th.nt;
+real nbv=th.nv;
+
+file << "ZONE NODES=" << nbv << " , ELEMENTS = " << nbt << " , DATAPACKING = POINT , ZONETYPE=FETRIANGLE " << endl;
+
+real xt,yt;
+
+for (int i=0; i<nbv; i++)
+{
+ real xt=th(i).x;
+ real yt=th(i).y;
+ file << xt << " " << yt << " "  << u(xt,yt) << " "  << v(xt,yt) << endl;
+};
+
+// Liste connectivite
+
+for (int k=0; k<nbt; k++)
+{
+        	file << int(th[k][0])+1 << " " << int(th[k][1])+1 << " " << int(th[k][2])+1 << endl;
+};
+		
+};
+
